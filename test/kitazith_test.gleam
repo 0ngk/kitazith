@@ -119,9 +119,9 @@ fn sample_embed() -> embed.Embed {
 
 fn sample_mentions() -> mentions.AllowedMentions {
   mentions.AllowedMentions(
-    parse: [mentions.Users],
-    roles: [],
-    users: ["42"],
+    parse: option.Some([mentions.Users]),
+    roles: option.Some([]),
+    users: option.Some(["42"]),
     replied_user: option.Some(False),
   )
 }
@@ -240,9 +240,9 @@ pub fn builder_mentions_test() {
     |> mentions.with_users(["42"])
     |> mentions.with_replied_user(False)
 
-  assert m.parse == [mentions.Users]
-  assert m.roles == []
-  assert m.users == ["42"]
+  assert m.parse == option.Some([mentions.Users])
+  assert m.roles == option.None
+  assert m.users == option.Some(["42"])
   assert m.replied_user == option.Some(False)
 }
 
