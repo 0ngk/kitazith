@@ -8,6 +8,7 @@ import kitazith/embed
 import kitazith/mentions
 import kitazith/payload
 import kitazith/poll
+import kitazith/snowflake
 
 pub fn main() -> Nil {
   gleeunit.main()
@@ -64,7 +65,7 @@ pub fn payload_supports_all_submodules_test() {
       attachments: Some([sample_attachment()]),
       flags: Some(0),
       thread_name: Some("release-notes"),
-      applied_tags: Some(["1234567890"]),
+      applied_tags: Some([snowflake.new("1234567890")]),
       poll: Some(sample_poll()),
     )
 
@@ -116,7 +117,7 @@ fn sample_mentions() -> mentions.AllowedMentions {
   mentions.AllowedMentions(
     parse: Some([mentions.Users]),
     roles: Some([]),
-    users: Some(["42"]),
+    users: Some([snowflake.new("42")]),
     replied_user: Some(False),
   )
 }
@@ -134,7 +135,7 @@ pub fn builder_payload_test() {
     |> payload.with_attachments([sample_attachment()])
     |> payload.with_flags(0)
     |> payload.with_thread_name("release-notes")
-    |> payload.with_applied_tags(["1234567890"])
+    |> payload.with_applied_tags([snowflake.new("1234567890")])
     |> payload.with_poll(sample_poll())
 
   assert webhook_payload.content == Some("Hello")
@@ -147,7 +148,7 @@ pub fn builder_payload_test() {
   assert webhook_payload.attachments == Some([sample_attachment()])
   assert webhook_payload.flags == Some(0)
   assert webhook_payload.thread_name == Some("release-notes")
-  assert webhook_payload.applied_tags == Some(["1234567890"])
+  assert webhook_payload.applied_tags == Some([snowflake.new("1234567890")])
   assert webhook_payload.poll == Some(sample_poll())
 }
 
@@ -227,12 +228,12 @@ pub fn builder_mentions_test() {
   let m =
     mentions.new_allowed_mentions()
     |> mentions.with_parse([mentions.Users])
-    |> mentions.with_users(["42"])
+    |> mentions.with_users([snowflake.new("42")])
     |> mentions.with_replied_user(False)
 
   assert m.parse == Some([mentions.Users])
   assert m.roles == None
-  assert m.users == Some(["42"])
+  assert m.users == Some([snowflake.new("42")])
   assert m.replied_user == Some(False)
 }
 
@@ -293,7 +294,7 @@ pub fn payload_full_to_json_test() {
     ])
     |> payload.with_flags(0)
     |> payload.with_thread_name("release-notes")
-    |> payload.with_applied_tags(["1234567890"])
+    |> payload.with_applied_tags([snowflake.new("1234567890")])
     |> payload.to_string
 
   assert result
@@ -331,7 +332,7 @@ pub fn mentions_to_json_test() {
   let result =
     mentions.new_allowed_mentions()
     |> mentions.with_parse([mentions.Roles, mentions.Users, mentions.Everyone])
-    |> mentions.with_users(["42"])
+    |> mentions.with_users([snowflake.new("42")])
     |> mentions.with_replied_user(False)
     |> mentions.to_json
     |> json.to_string
@@ -385,6 +386,15 @@ pub fn poll_to_json_test() {
 
   assert result
     == "{\"question\":{\"text\":\"Pick one\"},\"answers\":[{\"poll_media\":{\"text\":\"Option A\"}},{\"poll_media\":{\"text\":\"Option B\",\"emoji\":{\"name\":\"🔥\"}}}],\"duration\":24,\"allow_multiselect\":false}"
+}
+
+pub fn snowflake_to_json_test() {
+  let result =
+    snowflake.new("123456789012345678")
+    |> snowflake.to_json
+    |> json.to_string
+
+  assert result == "\"123456789012345678\""
 }
 
 fn sample_poll() -> poll.Poll {

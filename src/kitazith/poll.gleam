@@ -2,6 +2,7 @@ import gleam/json
 import gleam/option.{type Option, None, Some}
 
 import kitazith/internal/json_helper
+import kitazith/snowflake
 
 /// https://docs.discord.com/developers/resources/poll#poll-create-request-object
 pub type Poll {
@@ -32,7 +33,7 @@ pub type PollMedia {
 
 /// partial https://docs.discord.com/developers/resources/emoji#emoji-object
 pub type PollEmoji {
-  PollEmoji(id: Option(String), name: Option(String))
+  PollEmoji(id: Option(snowflake.Snowflake), name: Option(String))
 }
 
 pub fn new_poll(question: PollQuestion, answers: List(PollAnswer)) -> Poll {
@@ -73,7 +74,10 @@ pub fn new_poll_emoji() -> PollEmoji {
   PollEmoji(id: None, name: None)
 }
 
-pub fn with_poll_emoji_id(emoji: PollEmoji, id: String) -> PollEmoji {
+pub fn with_poll_emoji_id(
+  emoji: PollEmoji,
+  id: snowflake.Snowflake,
+) -> PollEmoji {
   PollEmoji(..emoji, id: Some(id))
 }
 
@@ -108,7 +112,7 @@ fn poll_media_to_json(m: PollMedia) -> json.Json {
 
 fn poll_emoji_to_json(e: PollEmoji) -> json.Json {
   json_helper.object_omit_none([
-    json_helper.optional("id", e.id, json.string),
+    json_helper.optional("id", e.id, snowflake.to_json),
     json_helper.optional("name", e.name, json.string),
   ])
 }

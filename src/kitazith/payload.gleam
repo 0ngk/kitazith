@@ -8,6 +8,7 @@ import kitazith/embed
 import kitazith/internal/json_helper
 import kitazith/mentions
 import kitazith/poll
+import kitazith/snowflake
 
 /// https://docs.discord.com/developers/resources/webhook#execute-webhook-json/form-params
 pub type Payload {
@@ -24,7 +25,7 @@ pub type Payload {
     flags: Option(Int),
     thread_name: Option(String),
     /// Snowflake IDs of tags applied to the message
-    applied_tags: Option(List(String)),
+    applied_tags: Option(List(snowflake.Snowflake)),
     poll: Option(poll.Poll),
   )
 }
@@ -97,7 +98,7 @@ pub fn with_thread_name(payload: Payload, thread_name: String) -> Payload {
 
 pub fn with_applied_tags(
   payload: Payload,
-  applied_tags: List(String),
+  applied_tags: List(snowflake.Snowflake),
 ) -> Payload {
   Payload(..payload, applied_tags: Some(applied_tags))
 }
@@ -129,7 +130,7 @@ pub fn to_json(payload: Payload) -> json.Json {
     json_helper.optional("flags", payload.flags, json.int),
     json_helper.optional("thread_name", payload.thread_name, json.string),
     json_helper.optional("applied_tags", payload.applied_tags, fn(tags) {
-      json.array(tags, json.string)
+      json.array(tags, snowflake.to_json)
     }),
     json_helper.optional("poll", payload.poll, poll.to_json),
   ])
