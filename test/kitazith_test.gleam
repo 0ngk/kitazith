@@ -1,13 +1,149 @@
+import gleam/dynamic
+import gleam/option
 import gleeunit
+import kitazith/attachment
+import kitazith/component
+import kitazith/embed
+import kitazith/mentions
+import kitazith/payload
+import kitazith/poll
 
 pub fn main() -> Nil {
   gleeunit.main()
 }
 
-// gleeunit test functions end in `_test`
-pub fn hello_world_test() {
-  let name = "Joe"
-  let greeting = "Hello, " <> name <> "!"
+pub fn new_payload_starts_empty_test() {
+  let webhook_payload = payload.new_payload()
 
-  assert greeting == "Hello, Joe!"
+  assert webhook_payload.content == option.None
+  assert webhook_payload.username == option.None
+  assert webhook_payload.avatar_url == option.None
+  assert webhook_payload.tts == option.None
+  assert webhook_payload.embeds == option.None
+  assert webhook_payload.allowed_mentions == option.None
+  assert webhook_payload.components == option.None
+  assert webhook_payload.attachments == option.None
+  assert webhook_payload.flags == option.None
+  assert webhook_payload.thread_name == option.None
+  assert webhook_payload.applied_tags == option.None
+  assert webhook_payload.poll == option.None
+}
+
+pub fn poll_only_payload_test() {
+  let webhook_payload =
+    payload.Payload(
+      content: option.None,
+      username: option.None,
+      avatar_url: option.None,
+      tts: option.None,
+      embeds: option.None,
+      allowed_mentions: option.None,
+      components: option.None,
+      attachments: option.None,
+      flags: option.None,
+      thread_name: option.None,
+      applied_tags: option.None,
+      poll: option.Some(sample_poll()),
+    )
+
+  assert webhook_payload.content == option.None
+  assert webhook_payload.poll == option.Some(sample_poll())
+}
+
+pub fn payload_supports_all_submodules_test() {
+  let webhook_payload =
+    payload.Payload(
+      content: option.None,
+      username: option.Some("kitazith"),
+      avatar_url: option.None,
+      tts: option.Some(False),
+      embeds: option.Some([sample_embed()]),
+      allowed_mentions: option.Some(sample_mentions()),
+      components: option.Some([sample_component()]),
+      attachments: option.Some([sample_attachment()]),
+      flags: option.Some(0),
+      thread_name: option.Some("release-notes"),
+      applied_tags: option.Some(["1234567890"]),
+      poll: option.Some(sample_poll()),
+    )
+
+  assert webhook_payload.username == option.Some("kitazith")
+  assert webhook_payload.embeds == option.Some([sample_embed()])
+  assert webhook_payload.allowed_mentions == option.Some(sample_mentions())
+  assert webhook_payload.components == option.Some([sample_component()])
+  assert webhook_payload.attachments == option.Some([sample_attachment()])
+  assert webhook_payload.poll == option.Some(sample_poll())
+}
+
+fn sample_attachment() -> attachment.Attachment {
+  attachment.Attachment(
+    id: "0",
+    filename: "banner.png",
+    description: option.Some("Release banner"),
+  )
+}
+
+fn sample_component() -> component.Component {
+  component.raw(dynamic.properties([#(dynamic.string("type"), dynamic.int(1))]))
+}
+
+fn sample_embed() -> embed.Embed {
+  embed.Embed(
+    title: option.Some("Release"),
+    description: option.Some("The build is ready."),
+    url: option.None,
+    timestamp: option.Some(embed.EmbedTimestamp("2026-03-15T09:30:00Z")),
+    color: option.Some(5_792_266),
+    footer: option.Some(embed.EmbedFooter(
+      text: "kitazith",
+      icon_url: option.Some("https://example.com/footer.png"),
+    )),
+    image: option.Some(embed.EmbedImage(url: "https://example.com/image.png")),
+    thumbnail: option.Some(embed.EmbedThumbnail(
+      url: "https://example.com/thumb.png",
+    )),
+    author: option.Some(embed.EmbedAuthor(
+      name: "Deployment Bot",
+      url: option.None,
+      icon_url: option.Some("https://example.com/avatar.png"),
+    )),
+    fields: option.Some([
+      embed.EmbedField(
+        name: "Status",
+        value: "Green",
+        inline: option.Some(True),
+      ),
+    ]),
+  )
+}
+
+fn sample_mentions() -> mentions.AllowedMentions {
+  mentions.AllowedMentions(
+    parse: [mentions.Users],
+    roles: [],
+    users: ["42"],
+    replied_user: option.Some(False),
+  )
+}
+
+fn sample_poll() -> poll.Poll {
+  poll.Poll(
+    question: poll.PollQuestion(text: "Pick one"),
+    answers: [
+      poll.PollAnswer(poll_media: poll.PollMedia(
+        text: option.Some("Option A"),
+        emoji: option.None,
+      )),
+      poll.PollAnswer(poll_media: poll.PollMedia(
+        text: option.Some("Option B"),
+        emoji: option.Some(poll.PollEmoji(
+          id: option.None,
+          name: option.Some("🔥"),
+        )),
+      )),
+    ],
+    duration: option.Some(24),
+    allow_multiselect: option.Some(False),
+    layout_type: option.Some(1),
+  )
 }
