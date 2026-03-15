@@ -1,7 +1,11 @@
+import gleam/json
 import gleam/option
+import gleam/string_tree.{type StringTree}
+
 import kitazith/attachment
 import kitazith/component
 import kitazith/embed
+import kitazith/internal/json_helper
 import kitazith/mentions
 import kitazith/poll
 
@@ -100,4 +104,45 @@ pub fn with_applied_tags(
 
 pub fn with_poll(payload: Payload, poll: poll.Poll) -> Payload {
   Payload(..payload, poll: option.Some(poll))
+}
+
+pub fn to_json(payload: Payload) -> json.Json {
+  json_helper.object_omit_none([
+    json_helper.optional("content", payload.content, json.string),
+    json_helper.optional("username", payload.username, json.string),
+    json_helper.optional("avatar_url", payload.avatar_url, json.string),
+    json_helper.optional("tts", payload.tts, json.bool),
+    json_helper.optional("embeds", payload.embeds, fn(embeds) {
+      json.array(embeds, embed.to_json)
+    }),
+    json_helper.optional(
+      "allowed_mentions",
+      payload.allowed_mentions,
+      mentions.to_json,
+    ),
+    json_helper.optional("components", payload.components, fn(components) {
+      json.array(components, component.to_json)
+    }),
+    json_helper.optional("attachments", payload.attachments, fn(attachments) {
+      json.array(attachments, attachment.to_json)
+    }),
+    json_helper.optional("flags", payload.flags, json.int),
+    json_helper.optional("thread_name", payload.thread_name, json.string),
+    json_helper.optional("applied_tags", payload.applied_tags, fn(tags) {
+      json.array(tags, json.string)
+    }),
+    json_helper.optional("poll", payload.poll, poll.to_json),
+  ])
+}
+
+pub fn to_string(payload: Payload) -> String {
+  payload
+  |> to_json
+  |> json.to_string
+}
+
+pub fn to_string_tree(payload: Payload) -> StringTree {
+  payload
+  |> to_json
+  |> json.to_string_tree
 }

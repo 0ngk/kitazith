@@ -1,4 +1,7 @@
+import gleam/json
 import gleam/option
+
+import kitazith/internal/json_helper
 
 /// https://docs.discord.com/developers/resources/message#allowed-mentions-object
 pub type AllowedMentions {
@@ -54,4 +57,27 @@ pub fn with_replied_user(
   replied_user: Bool,
 ) -> AllowedMentions {
   AllowedMentions(..mentions, replied_user: option.Some(replied_user))
+}
+
+pub fn to_json(m: AllowedMentions) -> json.Json {
+  json_helper.object_omit_none([
+    json_helper.optional("parse", m.parse, fn(parse) {
+      json.array(parse, allowed_mention_to_json)
+    }),
+    json_helper.optional("roles", m.roles, fn(roles) {
+      json.array(roles, json.string)
+    }),
+    json_helper.optional("users", m.users, fn(users) {
+      json.array(users, json.string)
+    }),
+    json_helper.optional("replied_user", m.replied_user, json.bool),
+  ])
+}
+
+fn allowed_mention_to_json(mention: AllowedMention) -> json.Json {
+  case mention {
+    Roles -> json.string("roles")
+    Users -> json.string("users")
+    Everyone -> json.string("everyone")
+  }
 }

@@ -1,4 +1,7 @@
-import gleam/option
+import gleam/json
+import gleam/option.{Some}
+
+import kitazith/internal/json_helper
 
 /// https://docs.discord.com/developers/resources/message#embed-object
 ///
@@ -139,4 +142,56 @@ pub fn new_field(name: String, value: String) -> EmbedField {
 
 pub fn with_field_inline(field: EmbedField, inline: Bool) -> EmbedField {
   EmbedField(..field, inline: option.Some(inline))
+}
+
+pub fn to_json(embed: Embed) -> json.Json {
+  json_helper.object_omit_none([
+    json_helper.optional("title", embed.title, json.string),
+    json_helper.optional("description", embed.description, json.string),
+    json_helper.optional("url", embed.url, json.string),
+    json_helper.optional("timestamp", embed.timestamp, embed_timestamp_to_json),
+    json_helper.optional("color", embed.color, json.int),
+    json_helper.optional("footer", embed.footer, embed_footer_to_json),
+    json_helper.optional("image", embed.image, embed_image_to_json),
+    json_helper.optional("thumbnail", embed.thumbnail, embed_thumbnail_to_json),
+    json_helper.optional("author", embed.author, embed_author_to_json),
+    json_helper.optional("fields", embed.fields, fn(fields) {
+      json.array(fields, embed_field_to_json)
+    }),
+  ])
+}
+
+fn embed_timestamp_to_json(timestamp: EmbedTimestamp) -> json.Json {
+  json.string(timestamp.iso8601)
+}
+
+fn embed_footer_to_json(footer: EmbedFooter) -> json.Json {
+  json_helper.object_omit_none([
+    Some(#("text", json.string(footer.text))),
+    json_helper.optional("icon_url", footer.icon_url, json.string),
+  ])
+}
+
+fn embed_image_to_json(image: EmbedImage) -> json.Json {
+  json.object([#("url", json.string(image.url))])
+}
+
+fn embed_thumbnail_to_json(thumbnail: EmbedThumbnail) -> json.Json {
+  json.object([#("url", json.string(thumbnail.url))])
+}
+
+fn embed_author_to_json(author: EmbedAuthor) -> json.Json {
+  json_helper.object_omit_none([
+    Some(#("name", json.string(author.name))),
+    json_helper.optional("url", author.url, json.string),
+    json_helper.optional("icon_url", author.icon_url, json.string),
+  ])
+}
+
+fn embed_field_to_json(field: EmbedField) -> json.Json {
+  json_helper.object_omit_none([
+    Some(#("name", json.string(field.name))),
+    Some(#("value", json.string(field.value))),
+    json_helper.optional("inline", field.inline, json.bool),
+  ])
 }
