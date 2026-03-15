@@ -1,5 +1,5 @@
 import gleam/json
-import gleam/option.{Some}
+import gleam/option.{type Option, None, Some}
 
 import kitazith/internal/json_helper
 
@@ -8,17 +8,17 @@ import kitazith/internal/json_helper
 /// `type`, `provider`, and `video` filds are not supported
 pub type Embed {
   Embed(
-    title: option.Option(String),
-    description: option.Option(String),
-    url: option.Option(String),
+    title: Option(String),
+    description: Option(String),
+    url: Option(String),
     /// ISO8601 timestamp
-    timestamp: option.Option(EmbedTimestamp),
-    color: option.Option(Int),
-    footer: option.Option(EmbedFooter),
-    image: option.Option(EmbedImage),
-    thumbnail: option.Option(EmbedThumbnail),
-    author: option.Option(EmbedAuthor),
-    fields: option.Option(List(EmbedField)),
+    timestamp: Option(EmbedTimestamp),
+    color: Option(Int),
+    footer: Option(EmbedFooter),
+    image: Option(EmbedImage),
+    thumbnail: Option(EmbedThumbnail),
+    author: Option(EmbedAuthor),
+    fields: Option(List(EmbedField)),
   )
 }
 
@@ -28,7 +28,7 @@ pub type EmbedTimestamp {
 
 /// https://docs.discord.com/developers/resources/message#embed-object-embed-footer-structure
 pub type EmbedFooter {
-  EmbedFooter(text: String, icon_url: option.Option(String))
+  EmbedFooter(text: String, icon_url: Option(String))
 }
 
 /// https://docs.discord.com/developers/resources/message#embed-object-embed-image-structure
@@ -43,105 +43,101 @@ pub type EmbedThumbnail {
 
 /// https://docs.discord.com/developers/resources/message#embed-object-embed-author-structure
 pub type EmbedAuthor {
-  EmbedAuthor(
-    name: String,
-    url: option.Option(String),
-    icon_url: option.Option(String),
-  )
+  EmbedAuthor(name: String, url: Option(String), icon_url: Option(String))
 }
 
 /// https://docs.discord.com/developers/resources/message#embed-object-embed-field-structure
 pub type EmbedField {
-  EmbedField(name: String, value: String, inline: option.Option(Bool))
+  EmbedField(name: String, value: String, inline: Option(Bool))
 }
 
 pub fn new_embed() -> Embed {
   Embed(
-    title: option.None,
-    description: option.None,
-    url: option.None,
-    timestamp: option.None,
-    color: option.None,
-    footer: option.None,
-    image: option.None,
-    thumbnail: option.None,
-    author: option.None,
-    fields: option.None,
+    title: None,
+    description: None,
+    url: None,
+    timestamp: None,
+    color: None,
+    footer: None,
+    image: None,
+    thumbnail: None,
+    author: None,
+    fields: None,
   )
 }
 
 pub fn with_title(embed: Embed, title: String) -> Embed {
-  Embed(..embed, title: option.Some(title))
+  Embed(..embed, title: Some(title))
 }
 
 pub fn with_description(embed: Embed, description: String) -> Embed {
-  Embed(..embed, description: option.Some(description))
+  Embed(..embed, description: Some(description))
 }
 
 pub fn with_url(embed: Embed, url: String) -> Embed {
-  Embed(..embed, url: option.Some(url))
+  Embed(..embed, url: Some(url))
 }
 
 pub fn with_timestamp(embed: Embed, timestamp: EmbedTimestamp) -> Embed {
-  Embed(..embed, timestamp: option.Some(timestamp))
+  Embed(..embed, timestamp: Some(timestamp))
 }
 
 pub fn with_color(embed: Embed, color: Int) -> Embed {
-  Embed(..embed, color: option.Some(color))
+  Embed(..embed, color: Some(color))
 }
 
 pub fn with_footer(embed: Embed, footer: EmbedFooter) -> Embed {
-  Embed(..embed, footer: option.Some(footer))
+  Embed(..embed, footer: Some(footer))
 }
 
 pub fn with_image(embed: Embed, image: EmbedImage) -> Embed {
-  Embed(..embed, image: option.Some(image))
+  Embed(..embed, image: Some(image))
 }
 
 pub fn with_thumbnail(embed: Embed, thumbnail: EmbedThumbnail) -> Embed {
-  Embed(..embed, thumbnail: option.Some(thumbnail))
+  Embed(..embed, thumbnail: Some(thumbnail))
 }
 
 pub fn with_author(embed: Embed, author: EmbedAuthor) -> Embed {
-  Embed(..embed, author: option.Some(author))
+  Embed(..embed, author: Some(author))
 }
 
 pub fn with_fields(embed: Embed, fields: List(EmbedField)) -> Embed {
-  Embed(..embed, fields: option.Some(fields))
+  Embed(..embed, fields: Some(fields))
 }
 
 pub fn new_footer(text: String) -> EmbedFooter {
-  EmbedFooter(text: text, icon_url: option.None)
+  EmbedFooter(text: text, icon_url: None)
 }
 
 pub fn with_footer_icon_url(
   footer: EmbedFooter,
   icon_url: String,
 ) -> EmbedFooter {
-  EmbedFooter(..footer, icon_url: option.Some(icon_url))
+  EmbedFooter(..footer, icon_url: Some(icon_url))
 }
 
 pub fn new_author(name: String) -> EmbedAuthor {
-  EmbedAuthor(name: name, url: option.None, icon_url: option.None)
+  EmbedAuthor(name: name, url: None, icon_url: None)
 }
 
 pub fn with_author_url(author: EmbedAuthor, url: String) -> EmbedAuthor {
-  EmbedAuthor(..author, url: option.Some(url))
+  EmbedAuthor(..author, url: Some(url))
 }
 
 pub fn with_author_icon_url(
   author: EmbedAuthor,
   icon_url: String,
 ) -> EmbedAuthor {
-  EmbedAuthor(..author, icon_url: option.Some(icon_url))
+  EmbedAuthor(..author, icon_url: Some(icon_url))
 }
 
 pub fn new_field(name: String, value: String) -> EmbedField {
-  EmbedField(name: name, value: value, inline: option.None)
+  EmbedField(name: name, value: value, inline: None)
 }
 
 pub fn with_field_inline(field: EmbedField, inline: Bool) -> EmbedField {
-  EmbedField(..field, inline: option.Some(inline))
+  EmbedField(..field, inline: Some(inline))
 }
 
 pub fn to_json(embed: Embed) -> json.Json {
