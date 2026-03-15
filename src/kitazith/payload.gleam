@@ -38,3 +38,63 @@ pub fn new_payload() -> Payload {
     poll: option.None,
   )
 }
+
+pub fn with_content(payload: Payload, content: String) -> Payload {
+  Payload(..payload, content: option.Some(content))
+}
+
+pub fn with_username(payload: Payload, username: String) -> Payload {
+  Payload(..payload, username: option.Some(username))
+}
+
+pub fn with_avatar_url(payload: Payload, avatar_url: String) -> Payload {
+  Payload(..payload, avatar_url: option.Some(avatar_url))
+}
+
+pub fn with_tts(payload: Payload, tts: Bool) -> Payload {
+  Payload(..payload, tts: option.Some(tts))
+}
+
+pub fn with_embeds(payload: Payload, embeds: List(embed.Embed)) -> Payload {
+  Payload(..payload, embeds: option.Some(embeds))
+}
+
+pub fn with_allowed_mentions(
+  payload: Payload,
+  allowed_mentions: mentions.AllowedMentions,
+) -> Payload {
+  Payload(..payload, allowed_mentions: option.Some(allowed_mentions))
+}
+
+pub fn with_components(
+  payload: Payload,
+  components: List(component.Component),
+) -> Payload {
+  Payload(..payload, components: option.Some(components))
+}
+
+pub fn with_attachments(
+  payload: Payload,
+  attachments: List(attachment.Attachment),
+) -> Payload {
+  Payload(..payload, attachments: option.Some(attachments))
+}
+
+pub fn with_flags(payload: Payload, flags: Int) -> Payload {
+  Payload(..payload, flags: option.Some(flags))
+}
+
+pub fn with_thread_name(payload: Payload, thread_name: String) -> Payload {
+  Payload(..payload, thread_name: option.Some(thread_name))
+}
+
+pub fn with_applied_tags(
+  payload: Payload,
+  applied_tags: List(String),
+) -> Payload {
+  Payload(..payload, applied_tags: option.Some(applied_tags))
+}
+
+pub fn with_poll(payload: Payload, poll: poll.Poll) -> Payload {
+  Payload(..payload, poll: option.Some(poll))
+}
