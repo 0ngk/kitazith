@@ -1,5 +1,6 @@
 import gleam/option
 
+/// https://docs.discord.com/developers/resources/poll#poll-create-request-object
 pub type Poll {
   Poll(
     question: PollQuestion,
@@ -10,18 +11,23 @@ pub type Poll {
   )
 }
 
+/// https://docs.discord.com/developers/resources/poll#poll-media-object
+/// Poll.question only supports text, while Poll.answers supports both text and emoji.
 pub type PollQuestion {
   PollQuestion(text: String)
 }
 
+/// https://docs.discord.com/developers/resources/poll#poll-media-object
 pub type PollAnswer {
   PollAnswer(poll_media: PollMedia)
 }
 
+/// https://docs.discord.com/developers/resources/poll#poll-media-object
 pub type PollMedia {
   PollMedia(text: option.Option(String), emoji: option.Option(PollEmoji))
 }
 
+/// partial https://docs.discord.com/developers/resources/emoji#emoji-object
 pub type PollEmoji {
   PollEmoji(id: option.Option(String), name: option.Option(String))
 }

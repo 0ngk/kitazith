@@ -5,18 +5,21 @@ import kitazith/embed
 import kitazith/mentions
 import kitazith/poll
 
+/// https://docs.discord.com/developers/resources/webhook#execute-webhook-json/form-params
 pub type Payload {
   Payload(
     content: option.Option(String),
     username: option.Option(String),
     avatar_url: option.Option(String),
     tts: option.Option(Bool),
+    /// Up to 10 embeds
     embeds: option.Option(List(embed.Embed)),
     allowed_mentions: option.Option(mentions.AllowedMentions),
     components: option.Option(List(component.Component)),
     attachments: option.Option(List(attachment.Attachment)),
     flags: option.Option(Int),
     thread_name: option.Option(String),
+    /// Snowflake IDs of tags applied to the message
     applied_tags: option.Option(List(String)),
     poll: option.Option(poll.Poll),
   )

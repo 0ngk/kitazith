@@ -1,10 +1,14 @@
 import gleam/option
 
+/// https://docs.discord.com/developers/resources/message#embed-object
+///
+/// `type`, `provider`, and `video` filds are not supported
 pub type Embed {
   Embed(
     title: option.Option(String),
     description: option.Option(String),
     url: option.Option(String),
+    /// ISO8601 timestamp
     timestamp: option.Option(EmbedTimestamp),
     color: option.Option(Int),
     footer: option.Option(EmbedFooter),
@@ -19,18 +23,22 @@ pub type EmbedTimestamp {
   EmbedTimestamp(iso8601: String)
 }
 
+/// https://docs.discord.com/developers/resources/message#embed-object-embed-footer-structure
 pub type EmbedFooter {
   EmbedFooter(text: String, icon_url: option.Option(String))
 }
 
+/// https://docs.discord.com/developers/resources/message#embed-object-embed-image-structure
 pub type EmbedImage {
   EmbedImage(url: String)
 }
 
+/// https://docs.discord.com/developers/resources/message#embed-object-embed-thumbnail-structure
 pub type EmbedThumbnail {
   EmbedThumbnail(url: String)
 }
 
+/// https://docs.discord.com/developers/resources/message#embed-object-embed-author-structure
 pub type EmbedAuthor {
   EmbedAuthor(
     name: String,
@@ -39,6 +47,7 @@ pub type EmbedAuthor {
   )
 }
 
+/// https://docs.discord.com/developers/resources/message#embed-object-embed-field-structure
 pub type EmbedField {
   EmbedField(name: String, value: String, inline: option.Option(Bool))
 }

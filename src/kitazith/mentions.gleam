@@ -1,14 +1,18 @@
 import gleam/option
 
+/// https://docs.discord.com/developers/resources/message#allowed-mentions-object
 pub type AllowedMentions {
   AllowedMentions(
-    parse: List(AllowedMention),
-    roles: List(String),
-    users: List(String),
+    parse: option.Option(List(AllowedMention)),
+    /// Snowflake IDs that can be mentioned. Up to 100.
+    roles: option.Option(List(String)),
+    /// Snowflake User IDs that can be mentioned. Up to 100.
+    users: option.Option(List(String)),
     replied_user: option.Option(Bool),
   )
 }
 
+/// https://docs.discord.com/developers/resources/message#allowed-mentions-object-allowed-mention-types
 pub type AllowedMention {
   Roles
   Users
@@ -16,28 +20,33 @@ pub type AllowedMention {
 }
 
 pub fn new_allowed_mentions() -> AllowedMentions {
-  AllowedMentions(parse: [], roles: [], users: [], replied_user: option.None)
+  AllowedMentions(
+    parse: option.None,
+    roles: option.None,
+    users: option.None,
+    replied_user: option.None,
+  )
 }
 
 pub fn with_parse(
   mentions: AllowedMentions,
   parse: List(AllowedMention),
 ) -> AllowedMentions {
-  AllowedMentions(..mentions, parse: parse)
+  AllowedMentions(..mentions, parse: option.Some(parse))
 }
 
 pub fn with_roles(
   mentions: AllowedMentions,
   roles: List(String),
 ) -> AllowedMentions {
-  AllowedMentions(..mentions, roles: roles)
+  AllowedMentions(..mentions, roles: option.Some(roles))
 }
 
 pub fn with_users(
   mentions: AllowedMentions,
   users: List(String),
 ) -> AllowedMentions {
-  AllowedMentions(..mentions, users: users)
+  AllowedMentions(..mentions, users: option.Some(users))
 }
 
 pub fn with_replied_user(
