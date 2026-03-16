@@ -2,6 +2,7 @@ import gleam/json
 import gleam/option.{type Option, None, Some}
 
 import kitazith/internal/json_helper
+import kitazith/timestamp
 
 /// https://docs.discord.com/developers/resources/message#embed-object
 ///
@@ -12,7 +13,7 @@ pub type Embed {
     description: Option(String),
     url: Option(String),
     /// ISO8601 timestamp
-    timestamp: Option(EmbedTimestamp),
+    timestamp: Option(timestamp.Timestamp),
     color: Option(Int),
     footer: Option(EmbedFooter),
     image: Option(EmbedImage),
@@ -20,10 +21,6 @@ pub type Embed {
     author: Option(EmbedAuthor),
     fields: Option(List(EmbedField)),
   )
-}
-
-pub type EmbedTimestamp {
-  EmbedTimestamp(iso8601: String)
 }
 
 /// https://docs.discord.com/developers/resources/message#embed-object-embed-footer-structure
@@ -78,7 +75,7 @@ pub fn with_url(embed: Embed, url: String) -> Embed {
   Embed(..embed, url: Some(url))
 }
 
-pub fn with_timestamp(embed: Embed, timestamp: EmbedTimestamp) -> Embed {
+pub fn with_timestamp(embed: Embed, timestamp: timestamp.Timestamp) -> Embed {
   Embed(..embed, timestamp: Some(timestamp))
 }
 
@@ -145,7 +142,7 @@ pub fn to_json(embed: Embed) -> json.Json {
     json_helper.optional("title", embed.title, json.string),
     json_helper.optional("description", embed.description, json.string),
     json_helper.optional("url", embed.url, json.string),
-    json_helper.optional("timestamp", embed.timestamp, embed_timestamp_to_json),
+    json_helper.optional("timestamp", embed.timestamp, timestamp.to_json),
     json_helper.optional("color", embed.color, json.int),
     json_helper.optional("footer", embed.footer, embed_footer_to_json),
     json_helper.optional("image", embed.image, embed_image_to_json),
@@ -155,10 +152,6 @@ pub fn to_json(embed: Embed) -> json.Json {
       json.array(fields, embed_field_to_json)
     }),
   ])
-}
-
-fn embed_timestamp_to_json(timestamp: EmbedTimestamp) -> json.Json {
-  json.string(timestamp.iso8601)
 }
 
 fn embed_footer_to_json(footer: EmbedFooter) -> json.Json {

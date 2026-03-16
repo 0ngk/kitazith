@@ -9,6 +9,7 @@ import kitazith/mentions
 import kitazith/payload
 import kitazith/poll
 import kitazith/snowflake
+import kitazith/timestamp
 
 pub fn main() -> Nil {
   gleeunit.main()
@@ -94,7 +95,7 @@ fn sample_embed() -> embed.Embed {
     title: Some("Release"),
     description: Some("The build is ready."),
     url: None,
-    timestamp: Some(embed.EmbedTimestamp("2026-03-15T09:30:00Z")),
+    timestamp: Some(sample_timestamp()),
     color: Some(5_792_266),
     footer: Some(embed.EmbedFooter(
       text: "kitazith",
@@ -158,7 +159,7 @@ pub fn builder_embed_test() {
     |> embed.with_title("Release")
     |> embed.with_description("The build is ready.")
     |> embed.with_url("https://example.com")
-    |> embed.with_timestamp(embed.EmbedTimestamp("2026-03-15T09:30:00Z"))
+    |> embed.with_timestamp(sample_timestamp())
     |> embed.with_color(5_792_266)
     |> embed.with_footer(
       embed.new_footer("kitazith")
@@ -306,7 +307,7 @@ pub fn embed_to_json_test() {
     embed.new_embed()
     |> embed.with_title("Release")
     |> embed.with_description("The build is ready.")
-    |> embed.with_timestamp(embed.EmbedTimestamp("2026-03-15T09:30:00Z"))
+    |> embed.with_timestamp(sample_timestamp())
     |> embed.with_color(5_792_266)
     |> embed.with_footer(
       embed.new_footer("kitazith")
@@ -397,6 +398,11 @@ pub fn snowflake_to_json_test() {
   assert result == "\"123456789012345678\""
 }
 
+fn sample_timestamp() -> timestamp.Timestamp {
+  let assert Ok(ts) = timestamp.from_rfc3339("2026-03-15T09:30:00Z")
+  ts
+}
+
 fn sample_poll() -> poll.Poll {
   poll.Poll(
     question: poll.PollQuestion(text: "Pick one"),
@@ -414,4 +420,34 @@ fn sample_poll() -> poll.Poll {
     allow_multiselect: Some(False),
     layout_type: Some(1),
   )
+}
+
+pub fn timestamp_from_rfc3339_valid_test() {
+  let result = timestamp.from_rfc3339("2026-03-15T09:30:00Z")
+  let assert Ok(ts) = result
+  let str = timestamp.to_string(ts)
+  assert str == "2026-03-15T09:30:00Z"
+}
+
+pub fn timestamp_from_rfc3339_invalid_test() {
+  let result = timestamp.from_rfc3339("not-a-timestamp")
+  assert result == Error(Nil)
+}
+
+pub fn timestamp_from_unix_seconds_test() {
+  let ts = timestamp.from_unix_seconds(0)
+  let str = timestamp.to_string(ts)
+  assert str == "1970-01-01T00:00:00Z"
+}
+
+pub fn timestamp_offset_normalized_to_utc_test() {
+  let assert Ok(ts) = timestamp.from_rfc3339("2026-03-15T18:30:00+09:00")
+  let str = timestamp.to_string(ts)
+  assert str == "2026-03-15T09:30:00Z"
+}
+
+pub fn timestamp_to_json_test() {
+  let assert Ok(ts) = timestamp.from_rfc3339("2026-03-15T09:30:00Z")
+  let result = ts |> timestamp.to_json |> json.to_string
+  assert result == "\"2026-03-15T09:30:00Z\""
 }
