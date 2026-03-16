@@ -2,10 +2,10 @@ import gleam/json
 import gleam/option.{None, Some}
 import gleeunit
 
+import kitazith/allowed_mentions
 import kitazith/attachment
 import kitazith/component
 import kitazith/embed
-import kitazith/mentions
 import kitazith/payload
 import kitazith/poll
 import kitazith/snowflake
@@ -61,7 +61,7 @@ pub fn payload_supports_all_submodules_test() {
       avatar_url: None,
       tts: Some(False),
       embeds: Some([sample_embed()]),
-      allowed_mentions: Some(sample_mentions()),
+      allowed_mentions: Some(sample_allowed_mentions()),
       components: Some([sample_component()]),
       attachments: Some([sample_attachment()]),
       flags: Some(0),
@@ -72,7 +72,7 @@ pub fn payload_supports_all_submodules_test() {
 
   assert webhook_payload.username == Some("kitazith")
   assert webhook_payload.embeds == Some([sample_embed()])
-  assert webhook_payload.allowed_mentions == Some(sample_mentions())
+  assert webhook_payload.allowed_mentions == Some(sample_allowed_mentions())
   assert webhook_payload.components == Some([sample_component()])
   assert webhook_payload.attachments == Some([sample_attachment()])
   assert webhook_payload.poll == Some(sample_poll())
@@ -114,9 +114,9 @@ fn sample_embed() -> embed.Embed {
   )
 }
 
-fn sample_mentions() -> mentions.AllowedMentions {
-  mentions.AllowedMentions(
-    parse: Some([mentions.Users]),
+fn sample_allowed_mentions() -> allowed_mentions.AllowedMentions {
+  allowed_mentions.AllowedMentions(
+    parse: Some([allowed_mentions.Users]),
     roles: Some([]),
     users: Some([snowflake.new("42")]),
     replied_user: Some(False),
@@ -131,7 +131,7 @@ pub fn builder_payload_test() {
     |> payload.with_avatar_url("https://example.com/avatar.png")
     |> payload.with_tts(False)
     |> payload.with_embeds([sample_embed()])
-    |> payload.with_allowed_mentions(sample_mentions())
+    |> payload.with_allowed_mentions(sample_allowed_mentions())
     |> payload.with_components([sample_component()])
     |> payload.with_attachments([sample_attachment()])
     |> payload.with_flags(0)
@@ -144,7 +144,7 @@ pub fn builder_payload_test() {
   assert webhook_payload.avatar_url == Some("https://example.com/avatar.png")
   assert webhook_payload.tts == Some(False)
   assert webhook_payload.embeds == Some([sample_embed()])
-  assert webhook_payload.allowed_mentions == Some(sample_mentions())
+  assert webhook_payload.allowed_mentions == Some(sample_allowed_mentions())
   assert webhook_payload.components == Some([sample_component()])
   assert webhook_payload.attachments == Some([sample_attachment()])
   assert webhook_payload.flags == Some(0)
@@ -225,14 +225,14 @@ pub fn builder_poll_test() {
   assert p.layout_type == Some(1)
 }
 
-pub fn builder_mentions_test() {
+pub fn builder_allowed_mentions_test() {
   let m =
-    mentions.new_allowed_mentions()
-    |> mentions.with_parse([mentions.Users])
-    |> mentions.with_users([snowflake.new("42")])
-    |> mentions.with_replied_user(False)
+    allowed_mentions.new_allowed_mentions()
+    |> allowed_mentions.with_parse([allowed_mentions.Users])
+    |> allowed_mentions.with_users([snowflake.new("42")])
+    |> allowed_mentions.with_replied_user(False)
 
-  assert m.parse == Some([mentions.Users])
+  assert m.parse == Some([allowed_mentions.Users])
   assert m.roles == None
   assert m.users == Some([snowflake.new("42")])
   assert m.replied_user == Some(False)
@@ -284,8 +284,8 @@ pub fn payload_full_to_json_test() {
       |> embed.with_title("Release"),
     ])
     |> payload.with_allowed_mentions(
-      mentions.new_allowed_mentions()
-      |> mentions.with_parse([mentions.Users]),
+      allowed_mentions.new_allowed_mentions()
+      |> allowed_mentions.with_parse([allowed_mentions.Users]),
     )
     |> payload.with_components([
       component.raw(json.object([#("type", json.int(1))])),
@@ -329,13 +329,17 @@ pub fn embed_to_json_test() {
     == "{\"title\":\"Release\",\"description\":\"The build is ready.\",\"timestamp\":\"2026-03-15T09:30:00Z\",\"color\":5792266,\"footer\":{\"text\":\"kitazith\",\"icon_url\":\"https://example.com/footer.png\"},\"image\":{\"url\":\"https://example.com/image.png\"},\"author\":{\"name\":\"Bot\",\"icon_url\":\"https://example.com/avatar.png\"},\"fields\":[{\"name\":\"Status\",\"value\":\"Green\",\"inline\":true}]}"
 }
 
-pub fn mentions_to_json_test() {
+pub fn allowed_mentions_to_json_test() {
   let result =
-    mentions.new_allowed_mentions()
-    |> mentions.with_parse([mentions.Roles, mentions.Users, mentions.Everyone])
-    |> mentions.with_users([snowflake.new("42")])
-    |> mentions.with_replied_user(False)
-    |> mentions.to_json
+    allowed_mentions.new_allowed_mentions()
+    |> allowed_mentions.with_parse([
+      allowed_mentions.Roles,
+      allowed_mentions.Users,
+      allowed_mentions.Everyone,
+    ])
+    |> allowed_mentions.with_users([snowflake.new("42")])
+    |> allowed_mentions.with_replied_user(False)
+    |> allowed_mentions.to_json
     |> json.to_string
 
   assert result

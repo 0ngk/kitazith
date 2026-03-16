@@ -2,11 +2,11 @@ import gleam/json
 import gleam/option.{type Option, None, Some}
 import gleam/string_tree.{type StringTree}
 
+import kitazith/allowed_mentions
 import kitazith/attachment
 import kitazith/component
 import kitazith/embed
 import kitazith/internal/json_helper
-import kitazith/mentions
 import kitazith/poll
 import kitazith/snowflake
 
@@ -19,7 +19,7 @@ pub type Payload {
     tts: Option(Bool),
     /// Up to 10 embeds
     embeds: Option(List(embed.Embed)),
-    allowed_mentions: Option(mentions.AllowedMentions),
+    allowed_mentions: Option(allowed_mentions.AllowedMentions),
     components: Option(List(component.Component)),
     attachments: Option(List(attachment.Attachment)),
     flags: Option(Int),
@@ -69,9 +69,9 @@ pub fn with_embeds(payload: Payload, embeds: List(embed.Embed)) -> Payload {
 
 pub fn with_allowed_mentions(
   payload: Payload,
-  allowed_mentions: mentions.AllowedMentions,
+  mentions: allowed_mentions.AllowedMentions,
 ) -> Payload {
-  Payload(..payload, allowed_mentions: Some(allowed_mentions))
+  Payload(..payload, allowed_mentions: Some(mentions))
 }
 
 pub fn with_components(
@@ -119,7 +119,7 @@ pub fn to_json(payload: Payload) -> json.Json {
     json_helper.optional(
       "allowed_mentions",
       payload.allowed_mentions,
-      mentions.to_json,
+      allowed_mentions.to_json,
     ),
     json_helper.optional("components", payload.components, fn(components) {
       json.array(components, component.to_json)
