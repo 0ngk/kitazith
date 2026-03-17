@@ -4,6 +4,15 @@ import gleam/option.{Some}
 import kitazith/embed
 import kitazith/test_fixtures
 
+pub fn color_from_rgb_test() {
+  assert embed.color_from_rgb(255, 0, 0) == 0xFF0000
+  assert embed.color_from_rgb(0, 255, 0) == 0x00FF00
+  assert embed.color_from_rgb(0, 0, 255) == 0x0000FF
+  assert embed.color_from_rgb(88, 101, 242) == 5_793_266
+  assert embed.color_from_rgb(0, 0, 0) == 0
+  assert embed.color_from_rgb(255, 255, 255) == 0xFFFFFF
+}
+
 pub fn builder_embed_test() {
   let e =
     embed.new_embed()

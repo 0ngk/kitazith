@@ -109,6 +109,23 @@ pub fn with_color(embed: Embed, color: Int) -> Embed {
   Embed(..embed, color: Some(color))
 }
 
+/// Converts RGB components to a single color integer for use with `with_color`.
+///
+/// ## Examples
+///
+/// ```gleam
+/// color_from_rgb(255, 0, 0)
+/// // -> 0xFF0000 (== 16711680)
+/// ```
+///
+/// ```gleam
+/// embed.new_embed()
+/// |> embed.with_color(embed.color_from_rgb(88, 101, 242))
+/// ```
+pub fn color_from_rgb(red: Int, green: Int, blue: Int) -> Int {
+  red * 65_536 + green * 256 + blue
+}
+
 pub fn with_footer(embed: Embed, footer: EmbedFooter) -> Embed {
   Embed(..embed, footer: Some(footer))
 }
