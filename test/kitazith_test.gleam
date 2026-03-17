@@ -6,6 +6,7 @@ import kitazith/allowed_mentions
 import kitazith/attachment
 import kitazith/component
 import kitazith/embed
+import kitazith/message_formatting/emoji
 import kitazith/message_formatting/guild_navigation
 import kitazith/message_formatting/mention
 import kitazith/message_formatting/timestamp as message_timestamp
@@ -248,6 +249,13 @@ pub fn message_mention_format_test() {
   assert mention.role(id) == "<@&42>"
   assert mention.channel(id) == "<#42>"
   assert mention.command("ship", id) == "</ship:42>"
+}
+
+pub fn message_custom_emoji_format_test() {
+  assert emoji.custom("mmLol", snowflake.new("216154654256398347"))
+    == "<:mmLol:216154654256398347>"
+  assert emoji.animated("b1nzy", snowflake.new("392938283556143104"))
+    == "<a:b1nzy:392938283556143104>"
 }
 
 pub fn message_guild_navigation_format_test() {

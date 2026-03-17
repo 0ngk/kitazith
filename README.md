@@ -66,6 +66,7 @@ Further documentation can be found at <https://hexdocs.pm/kitazith>.
 helpers live under `kitazith/message_formatting`.
 
 ```gleam
+import kitazith/message_formatting/emoji
 import kitazith/message_formatting/guild_navigation
 import kitazith/message_formatting/mention
 import kitazith/message_formatting/timestamp as message_timestamp
@@ -77,6 +78,10 @@ pub fn user_tag() -> String {
 
 pub fn eta() -> String {
   message_timestamp.format(1_773_654_660, message_timestamp.RelativeTime)
+}
+
+pub fn party() -> String {
+  emoji.animated("blobdance", snowflake.new("1234567890"))
 }
 
 pub fn server_guide() -> String {
