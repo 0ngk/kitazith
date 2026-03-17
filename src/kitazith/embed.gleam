@@ -4,9 +4,11 @@ import gleam/option.{type Option, None, Some}
 import kitazith/internal/json_helper
 import kitazith/timestamp
 
-/// https://docs.discord.com/developers/resources/message#embed-object
+/// Learn more: [Message Resource - Documentation - Discord > Embed Object](https://docs.discord.com/developers/resources/message#embed-object)
 ///
-/// `type`, `provider`, and `video` filds are not supported
+/// `type`, `provider`, and `video` filds are not supported for the webhook embed objects.
+///
+/// Source: [Webhook Resource - Documentation - Discord > Execute Webhook](https://docs.discord.com/developers/resources/webhook#execute-webhook)
 pub type Embed {
   Embed(
     title: Option(String),
@@ -23,27 +25,27 @@ pub type Embed {
   )
 }
 
-/// https://docs.discord.com/developers/resources/message#embed-object-embed-footer-structure
+/// Learn more: [Message Resource - Documentation - Discord > Embed Footer Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-footer-structure)
 pub type EmbedFooter {
   EmbedFooter(text: String, icon_url: Option(String))
 }
 
-/// https://docs.discord.com/developers/resources/message#embed-object-embed-image-structure
+/// Learn more: [Message Resource - Documentation - Discord > Embed Image Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-image-structure)
 pub type EmbedImage {
   EmbedImage(url: String)
 }
 
-/// https://docs.discord.com/developers/resources/message#embed-object-embed-thumbnail-structure
+/// Learn more: [Message Resource - Documentation - Discord > Embed Thumbnail Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-thumbnail-structure)
 pub type EmbedThumbnail {
   EmbedThumbnail(url: String)
 }
 
-/// https://docs.discord.com/developers/resources/message#embed-object-embed-author-structure
+/// Learn more: [Message Resource - Documentation - Discord > Embed Author Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-author-structure)
 pub type EmbedAuthor {
   EmbedAuthor(name: String, url: Option(String), icon_url: Option(String))
 }
 
-/// https://docs.discord.com/developers/resources/message#embed-object-embed-field-structure
+/// Learn more: [Message Resource - Documentation - Discord > Embed Field Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-field-structure)
 pub type EmbedField {
   EmbedField(name: String, value: String, inline: Option(Bool))
 }

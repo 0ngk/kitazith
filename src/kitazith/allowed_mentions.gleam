@@ -4,11 +4,11 @@ import gleam/option.{type Option, None, Some}
 import kitazith/internal/json_helper
 import kitazith/snowflake
 
-/// https://docs.discord.com/developers/resources/message#allowed-mentions-object
+/// Learn more: [Message Resource - Documentation - Discord > Allowed Mentions Object](https://docs.discord.com/developers/resources/message#allowed-mentions-object)
 pub type AllowedMentions {
   AllowedMentions(
     parse: Option(List(AllowedMention)),
-    /// Snowflake IDs that can be mentioned. Up to 100.
+    /// Snowflake Role IDs that can be mentioned. Up to 100.
     roles: Option(List(snowflake.Snowflake)),
     /// Snowflake User IDs that can be mentioned. Up to 100.
     users: Option(List(snowflake.Snowflake)),
@@ -16,7 +16,7 @@ pub type AllowedMentions {
   )
 }
 
-/// https://docs.discord.com/developers/resources/message#allowed-mentions-object-allowed-mention-types
+/// Learn more: [Message Resource - Documentation - Discord > Allowed Mentions Object > Allowed Mention Types](https://docs.discord.com/developers/resources/message#allowed-mentions-object-allowed-mention-types)
 pub type AllowedMention {
   Roles
   Users

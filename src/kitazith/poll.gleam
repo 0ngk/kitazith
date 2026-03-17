@@ -4,7 +4,7 @@ import gleam/option.{type Option, None, Some}
 import kitazith/internal/json_helper
 import kitazith/snowflake
 
-/// https://docs.discord.com/developers/resources/poll#poll-create-request-object
+/// Learn more: [Poll Resource - Documentation - Discord > Poll Create Request Object](https://docs.discord.com/developers/resources/poll#poll-create-request-object)
 pub type Poll {
   Poll(
     question: PollQuestion,
@@ -15,23 +15,23 @@ pub type Poll {
   )
 }
 
-/// https://docs.discord.com/developers/resources/poll#poll-media-object
+/// Learn more: [Poll Resource - Documentation - Discord > Poll Media Object](https://docs.discord.com/developers/resources/poll#poll-media-object)
 /// Poll.question only supports text, while Poll.answers supports both text and emoji.
 pub type PollQuestion {
   PollQuestion(text: String)
 }
 
-/// https://docs.discord.com/developers/resources/poll#poll-media-object
+/// Learn more: [Poll Resource - Documentation - Discord > Poll Answer Object](https://docs.discord.com/developers/resources/poll#poll-media-object)
 pub type PollAnswer {
   PollAnswer(poll_media: PollMedia)
 }
 
-/// https://docs.discord.com/developers/resources/poll#poll-media-object
+/// Learn more: [Poll Resource - Documentation - Discord > Poll Media Object](https://docs.discord.com/developers/resources/poll#poll-media-object)
 pub type PollMedia {
   PollMedia(text: Option(String), emoji: Option(PollEmoji))
 }
 
-/// partial https://docs.discord.com/developers/resources/emoji#emoji-object
+/// Learn more: Partial [Emoji Resource - Documentation - Discord > Emoji Object](https://docs.discord.com/developers/resources/emoji#emoji-object)
 pub type PollEmoji {
   PollEmoji(id: Option(snowflake.Snowflake), name: Option(String))
 }

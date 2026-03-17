@@ -1,16 +1,23 @@
 /// Discord guild navigation link types.
-/// https://docs.discord.com/developers/reference#message-formatting
+///
+/// Learn more: [API Reference - Documentation - Discord > Message Formatting > Guild Navigation Types](https://docs.discord.com/developers/reference#message-formatting)
 pub type GuildNavigationType {
   /// Customize tab
-  /// https://support.discord.com/hc/en-us/articles/11074987197975-Community-Onboarding-FAQ
+  ///
+  /// Learn more: [Community Onboarding FAQ – Discord](https://support.discord.com/hc/en-us/articles/11074987197975-Community-Onboarding-FAQ)
   Customize
+
   /// Browse channel
   Browse
+
   /// Server Guide
-  /// https://support.discord.com/hc/en-us/articles/13497665141655
+  ///
+  /// Learn more: [Server Guide FAQ – Discord](https://support.discord.com/hc/en-us/articles/13497665141655-Server-Guide-FAQ)
   Guide
+
   /// Linked Roles
-  /// https://support.discord.com/hc/en-us/articles/10388356626711
+  ///
+  /// Learn more: [Connections & Linked Roles: Admins – Discord](https://support.discord.com/hc/en-us/articles/10388356626711-Connections-Linked-Roles-Admins)
   LinkedRoles
 }
 
