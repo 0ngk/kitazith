@@ -60,6 +60,25 @@ pub fn main() -> Nil {
 
 Further documentation can be found at <https://hexdocs.pm/kitazith>.
 
+## Discord Message Formatting
+
+`kitazith/timestamp` is for embed JSON timestamps. Message content formatting
+helpers live under `kitazith/message_formatting`.
+
+```gleam
+import kitazith/message_formatting/mention
+import kitazith/message_formatting/timestamp as message_timestamp
+import kitazith/snowflake
+
+pub fn user_tag() -> String {
+  mention.user(snowflake.new("1234567890"))
+}
+
+pub fn eta() -> String {
+  message_timestamp.format(1_773_654_660, message_timestamp.RelativeTime)
+}
+```
+
 ## Development
 
 ```sh

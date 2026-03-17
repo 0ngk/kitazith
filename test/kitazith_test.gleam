@@ -6,6 +6,8 @@ import kitazith/allowed_mentions
 import kitazith/attachment
 import kitazith/component
 import kitazith/embed
+import kitazith/message_formatting/mention
+import kitazith/message_formatting/timestamp as message_timestamp
 import kitazith/payload
 import kitazith/poll
 import kitazith/snowflake
@@ -236,6 +238,42 @@ pub fn builder_allowed_mentions_test() {
   assert m.roles == None
   assert m.users == Some([snowflake.new("42")])
   assert m.replied_user == Some(False)
+}
+
+pub fn message_mention_format_test() {
+  let id = snowflake.new("42")
+
+  assert mention.user(id) == "<@42>"
+  assert mention.role(id) == "<@&42>"
+  assert mention.channel(id) == "<#42>"
+  assert mention.command("ship", id) == "</ship:42>"
+}
+
+pub fn message_timestamp_format_test() {
+  let seconds = 1_773_654_660
+
+  assert message_timestamp.default(seconds) == "<t:1773654660>"
+  assert message_timestamp.format(seconds, message_timestamp.ShortDate)
+    == "<t:1773654660:d>"
+  assert message_timestamp.format(seconds, message_timestamp.LongDate)
+    == "<t:1773654660:D>"
+  assert message_timestamp.format(seconds, message_timestamp.ShortTime)
+    == "<t:1773654660:t>"
+  assert message_timestamp.format(seconds, message_timestamp.MediumTime)
+    == "<t:1773654660:T>"
+  assert message_timestamp.format(seconds, message_timestamp.LongDateShortTime)
+    == "<t:1773654660:f>"
+  assert message_timestamp.format(seconds, message_timestamp.FullDateShortTime)
+    == "<t:1773654660:F>"
+  assert message_timestamp.format(seconds, message_timestamp.ShortDateShortTime)
+    == "<t:1773654660:s>"
+  assert message_timestamp.format(
+      seconds,
+      message_timestamp.ShortDateMediumTime,
+    )
+    == "<t:1773654660:S>"
+  assert message_timestamp.format(seconds, message_timestamp.RelativeTime)
+    == "<t:1773654660:R>"
 }
 
 pub fn builder_attachment_test() {
