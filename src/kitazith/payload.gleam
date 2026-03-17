@@ -13,11 +13,19 @@ import kitazith/snowflake
 /// Learn more: [Webhook Resource - Documentation - Discord > Execute Webhook > JSON/Form Params](https://docs.discord.com/developers/resources/webhook#execute-webhook-json/form-params)
 pub type Payload {
   Payload(
+    /// Up to 2000 characters.
     content: Option(String),
+    /// At least 1 character and up to 80 characters.
     username: Option(String),
     avatar_url: Option(String),
     tts: Option(Bool),
-    /// Up to 10 embeds
+    /// Up to 10 embeds.
+    ///
+    /// Up to 6000 characters total across all `title`, `description`,
+    /// `field.name`, `field.value`, `footer.text`, and `author.name` fields
+    /// in all embeds per message.
+    ///
+    /// Source: [Message Resource - Documentation - Discord > Embed Object > Embed Limits](https://docs.discord.com/developers/resources/message#embed-object-embed-limits)
     embeds: Option(List(embed.Embed)),
     allowed_mentions: Option(allowed_mentions.AllowedMentions),
     components: Option(List(component.Component)),

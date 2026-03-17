@@ -6,12 +6,20 @@ import kitazith/timestamp
 
 /// Learn more: [Message Resource - Documentation - Discord > Embed Object](https://docs.discord.com/developers/resources/message#embed-object)
 ///
+/// Up to 6000 characters total across all `title`, `description`,
+/// `field.name`, `field.value`, `footer.text`, and `author.name` fields
+/// in all embeds per message.
+///
+/// Source: [Message Resource - Documentation - Discord > Embed Object > Embed Limits](https://docs.discord.com/developers/resources/message#embed-object-embed-limits)
+///
 /// `type`, `provider`, and `video` filds are not supported for the webhook embed objects.
 ///
 /// Source: [Webhook Resource - Documentation - Discord > Execute Webhook](https://docs.discord.com/developers/resources/webhook#execute-webhook)
 pub type Embed {
   Embed(
+    /// Up to 256 characters.
     title: Option(String),
+    /// Up to 4096 characters.
     description: Option(String),
     url: Option(String),
     /// ISO8601 timestamp
@@ -21,13 +29,18 @@ pub type Embed {
     image: Option(EmbedImage),
     thumbnail: Option(EmbedThumbnail),
     author: Option(EmbedAuthor),
+    /// Up to 25 fields.
     fields: Option(List(EmbedField)),
   )
 }
 
 /// Learn more: [Message Resource - Documentation - Discord > Embed Footer Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-footer-structure)
 pub type EmbedFooter {
-  EmbedFooter(text: String, icon_url: Option(String))
+  EmbedFooter(
+    /// Up to 2048 characters.
+    text: String,
+    icon_url: Option(String),
+  )
 }
 
 /// Learn more: [Message Resource - Documentation - Discord > Embed Image Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-image-structure)
@@ -42,12 +55,23 @@ pub type EmbedThumbnail {
 
 /// Learn more: [Message Resource - Documentation - Discord > Embed Author Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-author-structure)
 pub type EmbedAuthor {
-  EmbedAuthor(name: String, url: Option(String), icon_url: Option(String))
+  EmbedAuthor(
+    /// Up to 256 characters.
+    name: String,
+    url: Option(String),
+    icon_url: Option(String),
+  )
 }
 
 /// Learn more: [Message Resource - Documentation - Discord > Embed Field Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-field-structure)
 pub type EmbedField {
-  EmbedField(name: String, value: String, inline: Option(Bool))
+  EmbedField(
+    /// Up to 256 characters.
+    name: String,
+    /// Up to 1024 characters.
+    value: String,
+    inline: Option(Bool),
+  )
 }
 
 pub fn new_embed() -> Embed {

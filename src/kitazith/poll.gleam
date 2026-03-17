@@ -8,7 +8,9 @@ import kitazith/snowflake
 pub type Poll {
   Poll(
     question: PollQuestion,
+    /// Up to 10 answers.
     answers: List(PollAnswer),
+    /// Duration in hours. Up to 768 hours == 32 days.
     duration: Option(Int),
     allow_multiselect: Option(Bool),
     layout_type: Option(Int),
@@ -18,7 +20,10 @@ pub type Poll {
 /// Learn more: [Poll Resource - Documentation - Discord > Poll Media Object](https://docs.discord.com/developers/resources/poll#poll-media-object)
 /// Poll.question only supports text, while Poll.answers supports both text and emoji.
 pub type PollQuestion {
-  PollQuestion(text: String)
+  PollQuestion(
+    /// Up to 300 characters.
+    text: String,
+  )
 }
 
 /// Learn more: [Poll Resource - Documentation - Discord > Poll Answer Object](https://docs.discord.com/developers/resources/poll#poll-media-object)
@@ -28,12 +33,21 @@ pub type PollAnswer {
 
 /// Learn more: [Poll Resource - Documentation - Discord > Poll Media Object](https://docs.discord.com/developers/resources/poll#poll-media-object)
 pub type PollMedia {
-  PollMedia(text: Option(String), emoji: Option(PollEmoji))
+  PollMedia(
+    /// Up to 55 characters for any answer.
+    text: Option(String),
+    emoji: Option(PollEmoji),
+  )
 }
 
 /// Learn more: Partial [Emoji Resource - Documentation - Discord > Emoji Object](https://docs.discord.com/developers/resources/emoji#emoji-object)
 pub type PollEmoji {
-  PollEmoji(id: Option(snowflake.Snowflake), name: Option(String))
+  PollEmoji(
+    /// Specify if custom emoji.
+    id: Option(snowflake.Snowflake),
+    /// Specify if default emoji.
+    name: Option(String),
+  )
 }
 
 pub fn new_poll(question: PollQuestion, answers: List(PollAnswer)) -> Poll {

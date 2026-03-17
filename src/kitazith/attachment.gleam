@@ -4,7 +4,12 @@ import gleam/option.{type Option, None, Some}
 import kitazith/internal/json_helper
 
 pub type Attachment {
-  Attachment(id: String, filename: String, description: Option(String))
+  Attachment(
+    id: String,
+    filename: String,
+    /// Up to 1024 characters.
+    description: Option(String),
+  )
 }
 
 pub fn new_attachment(id: String, filename: String) -> Attachment {
