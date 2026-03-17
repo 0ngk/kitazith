@@ -6,6 +6,7 @@ import kitazith/allowed_mentions
 import kitazith/attachment
 import kitazith/component
 import kitazith/embed
+import kitazith/message_formatting/guild_navigation
 import kitazith/message_formatting/mention
 import kitazith/message_formatting/timestamp as message_timestamp
 import kitazith/payload
@@ -247,6 +248,14 @@ pub fn message_mention_format_test() {
   assert mention.role(id) == "<@&42>"
   assert mention.channel(id) == "<#42>"
   assert mention.command("ship", id) == "</ship:42>"
+}
+
+pub fn message_guild_navigation_format_test() {
+  assert guild_navigation.format(guild_navigation.Customize) == "<id:customize>"
+  assert guild_navigation.format(guild_navigation.Browse) == "<id:browse>"
+  assert guild_navigation.format(guild_navigation.Guide) == "<id:guide>"
+  assert guild_navigation.format(guild_navigation.LinkedRoles)
+    == "<id:linked-roles>"
 }
 
 pub fn message_timestamp_format_test() {
