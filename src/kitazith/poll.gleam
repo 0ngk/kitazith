@@ -46,6 +46,10 @@ pub type PollEmoji {
     /// Specify if custom emoji.
     id: Option(snowflake.Snowflake),
     /// Specify if default emoji.
+    ///
+    /// Example 1: `option.Option("🔥")`
+    ///
+    /// Example 2: `option.Option("\u{1f525}")`
     name: Option(String),
   )
 }
