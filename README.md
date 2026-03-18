@@ -17,8 +17,8 @@ gleam add kitazith
 
 ```gleam
 import gleam/option
-import kitazith/payload
 import kitazith/poll
+import kitazith/webhook/execute
 
 pub fn main() -> Nil {
   let release_poll =
@@ -38,7 +38,7 @@ pub fn main() -> Nil {
     )
 
   let webhook_payload =
-    payload.Payload(
+    execute.ExecutePayload(
       content: option.None,
       username: option.Some("kitazith"),
       avatar_url: option.None,
@@ -46,7 +46,6 @@ pub fn main() -> Nil {
       embeds: option.None,
       allowed_mentions: option.None,
       components: option.None,
-      files: option.None,
       attachments: option.None,
       flags: option.None,
       thread_name: option.None,

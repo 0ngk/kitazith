@@ -11,8 +11,8 @@ import kitazith/poll
 import kitazith/snowflake
 
 /// Learn more: [Webhook Resource - Documentation - Discord > Execute Webhook > JSON/Form Params](https://docs.discord.com/developers/resources/webhook#execute-webhook-json/form-params)
-pub type Payload {
-  Payload(
+pub type ExecutePayload {
+  ExecutePayload(
     /// Up to 2000 characters.
     content: Option(String),
     /// At least 1 character and up to 80 characters.
@@ -38,8 +38,8 @@ pub type Payload {
   )
 }
 
-pub fn new_payload() -> Payload {
-  Payload(
+pub fn new_execute_payload() -> ExecutePayload {
+  ExecutePayload(
     content: None,
     username: None,
     avatar_url: None,
@@ -55,67 +55,79 @@ pub fn new_payload() -> Payload {
   )
 }
 
-pub fn with_content(payload: Payload, content: String) -> Payload {
-  Payload(..payload, content: Some(content))
+pub fn with_content(payload: ExecutePayload, content: String) -> ExecutePayload {
+  ExecutePayload(..payload, content: Some(content))
 }
 
-pub fn with_username(payload: Payload, username: String) -> Payload {
-  Payload(..payload, username: Some(username))
+pub fn with_username(
+  payload: ExecutePayload,
+  username: String,
+) -> ExecutePayload {
+  ExecutePayload(..payload, username: Some(username))
 }
 
-pub fn with_avatar_url(payload: Payload, avatar_url: String) -> Payload {
-  Payload(..payload, avatar_url: Some(avatar_url))
+pub fn with_avatar_url(
+  payload: ExecutePayload,
+  avatar_url: String,
+) -> ExecutePayload {
+  ExecutePayload(..payload, avatar_url: Some(avatar_url))
 }
 
-pub fn with_tts(payload: Payload, tts: Bool) -> Payload {
-  Payload(..payload, tts: Some(tts))
+pub fn with_tts(payload: ExecutePayload, tts: Bool) -> ExecutePayload {
+  ExecutePayload(..payload, tts: Some(tts))
 }
 
-pub fn with_embeds(payload: Payload, embeds: List(embed.Embed)) -> Payload {
-  Payload(..payload, embeds: Some(embeds))
+pub fn with_embeds(
+  payload: ExecutePayload,
+  embeds: List(embed.Embed),
+) -> ExecutePayload {
+  ExecutePayload(..payload, embeds: Some(embeds))
 }
 
 pub fn with_allowed_mentions(
-  payload: Payload,
+  payload: ExecutePayload,
   mentions: allowed_mentions.AllowedMentions,
-) -> Payload {
-  Payload(..payload, allowed_mentions: Some(mentions))
+) -> ExecutePayload {
+  ExecutePayload(..payload, allowed_mentions: Some(mentions))
 }
 
 pub fn with_components(
-  payload: Payload,
+  payload: ExecutePayload,
   components: List(component.Component),
-) -> Payload {
-  Payload(..payload, components: Some(components))
+) -> ExecutePayload {
+  ExecutePayload(..payload, components: Some(components))
 }
 
 pub fn with_attachments(
-  payload: Payload,
+  payload: ExecutePayload,
   attachments: List(attachment.Attachment),
-) -> Payload {
-  Payload(..payload, attachments: Some(attachments))
+) -> ExecutePayload {
+  ExecutePayload(..payload, attachments: Some(attachments))
 }
 
-pub fn with_flags(payload: Payload, flags: Int) -> Payload {
-  Payload(..payload, flags: Some(flags))
+pub fn with_flags(payload: ExecutePayload, flags: Int) -> ExecutePayload {
+  ExecutePayload(..payload, flags: Some(flags))
 }
 
-pub fn with_thread_name(payload: Payload, thread_name: String) -> Payload {
-  Payload(..payload, thread_name: Some(thread_name))
+pub fn with_thread_name(
+  payload: ExecutePayload,
+  thread_name: String,
+) -> ExecutePayload {
+  ExecutePayload(..payload, thread_name: Some(thread_name))
 }
 
 pub fn with_applied_tags(
-  payload: Payload,
+  payload: ExecutePayload,
   applied_tags: List(snowflake.Snowflake),
-) -> Payload {
-  Payload(..payload, applied_tags: Some(applied_tags))
+) -> ExecutePayload {
+  ExecutePayload(..payload, applied_tags: Some(applied_tags))
 }
 
-pub fn with_poll(payload: Payload, poll: poll.Poll) -> Payload {
-  Payload(..payload, poll: Some(poll))
+pub fn with_poll(payload: ExecutePayload, poll: poll.Poll) -> ExecutePayload {
+  ExecutePayload(..payload, poll: Some(poll))
 }
 
-pub fn to_json(payload: Payload) -> json.Json {
+pub fn to_json(payload: ExecutePayload) -> json.Json {
   json_helper.object_omit_none([
     json_helper.optional("content", payload.content, json.string),
     json_helper.optional("username", payload.username, json.string),
@@ -144,13 +156,13 @@ pub fn to_json(payload: Payload) -> json.Json {
   ])
 }
 
-pub fn to_string(payload: Payload) -> String {
+pub fn to_string(payload: ExecutePayload) -> String {
   payload
   |> to_json
   |> json.to_string
 }
 
-pub fn to_string_tree(payload: Payload) -> StringTree {
+pub fn to_string_tree(payload: ExecutePayload) -> StringTree {
   payload
   |> to_json
   |> json.to_string_tree
