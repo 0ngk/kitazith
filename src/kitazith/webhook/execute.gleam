@@ -1,4 +1,5 @@
 import gleam/json
+import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/string_tree.{type StringTree}
 
@@ -6,6 +7,7 @@ import kitazith/allowed_mentions
 import kitazith/attachment
 import kitazith/component
 import kitazith/embed
+import kitazith/flag
 import kitazith/internal/json_helper
 import kitazith/poll
 import kitazith/snowflake
@@ -30,12 +32,21 @@ pub type ExecutePayload {
     allowed_mentions: Option(allowed_mentions.AllowedMentions),
     components: Option(List(component.Component)),
     attachments: Option(List(attachment.Attachment)),
-    flags: Option(Int),
+    flags: Option(List(ExecutePayloadFlag)),
     thread_name: Option(String),
     /// Snowflake IDs of tags applied to the message
     applied_tags: Option(List(snowflake.Snowflake)),
     poll: Option(poll.Poll),
   )
+}
+
+/// Learn more:
+pub type ExecutePayloadFlag {
+  /// Include no embeds
+  SuppressEmbeds
+  /// Do not triger a notification
+  SuppressNotifications
+  IsComponentsV2
 }
 
 pub fn new_execute_payload() -> ExecutePayload {
@@ -105,7 +116,10 @@ pub fn with_attachments(
   ExecutePayload(..payload, attachments: Some(attachments))
 }
 
-pub fn with_flags(payload: ExecutePayload, flags: Int) -> ExecutePayload {
+pub fn with_flags(
+  payload: ExecutePayload,
+  flags: List(ExecutePayloadFlag),
+) -> ExecutePayload {
   ExecutePayload(..payload, flags: Some(flags))
 }
 
@@ -147,7 +161,12 @@ pub fn to_json(payload: ExecutePayload) -> json.Json {
     json_helper.optional("attachments", payload.attachments, fn(attachments) {
       json.array(attachments, attachment.to_json)
     }),
-    json_helper.optional("flags", payload.flags, json.int),
+    json_helper.optional("flags", payload.flags, fn(flags) {
+      flags
+      |> list.map(execute_payload_flag_to_message_flag)
+      |> flag.to_int
+      |> json.int
+    }),
     json_helper.optional("thread_name", payload.thread_name, json.string),
     json_helper.optional("applied_tags", payload.applied_tags, fn(tags) {
       json.array(tags, snowflake.to_json)
@@ -166,4 +185,14 @@ pub fn to_string_tree(payload: ExecutePayload) -> StringTree {
   payload
   |> to_json
   |> json.to_string_tree
+}
+
+fn execute_payload_flag_to_message_flag(
+  execute_payload_flag: ExecutePayloadFlag,
+) -> flag.MessageFlag {
+  case execute_payload_flag {
+    SuppressEmbeds -> flag.SuppressEmbeds
+    SuppressNotifications -> flag.SuppressNotifications
+    IsComponentsV2 -> flag.IsComponentsV2
+  }
 }

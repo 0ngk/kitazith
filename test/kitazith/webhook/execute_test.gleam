@@ -58,7 +58,7 @@ pub fn execute_payload_supports_all_submodules_test() {
       allowed_mentions: Some(test_fixtures.sample_allowed_mentions()),
       components: Some([test_fixtures.sample_component()]),
       attachments: Some([test_fixtures.sample_attachment()]),
-      flags: Some(0),
+      flags: Some([execute.SuppressEmbeds]),
       thread_name: Some("release-notes"),
       applied_tags: Some([snowflake.new("1234567890")]),
       poll: Some(test_fixtures.sample_poll()),
@@ -85,7 +85,7 @@ pub fn builder_execute_payload_test() {
     |> execute.with_allowed_mentions(test_fixtures.sample_allowed_mentions())
     |> execute.with_components([test_fixtures.sample_component()])
     |> execute.with_attachments([test_fixtures.sample_attachment()])
-    |> execute.with_flags(0)
+    |> execute.with_flags([execute.SuppressEmbeds])
     |> execute.with_thread_name("release-notes")
     |> execute.with_applied_tags([snowflake.new("1234567890")])
     |> execute.with_poll(test_fixtures.sample_poll())
@@ -100,7 +100,7 @@ pub fn builder_execute_payload_test() {
   assert execute_payload.components == Some([test_fixtures.sample_component()])
   assert execute_payload.attachments
     == Some([test_fixtures.sample_attachment()])
-  assert execute_payload.flags == Some(0)
+  assert execute_payload.flags == Some([execute.SuppressEmbeds])
   assert execute_payload.thread_name == Some("release-notes")
   assert execute_payload.applied_tags == Some([snowflake.new("1234567890")])
   assert execute_payload.poll == Some(test_fixtures.sample_poll())
@@ -124,7 +124,7 @@ pub fn execute_payload_falsy_values_preserved_test() {
   let result =
     execute.new_execute_payload()
     |> execute.with_tts(False)
-    |> execute.with_flags(0)
+    |> execute.with_flags([])
     |> execute.with_embeds([])
     |> execute.to_string
 
@@ -151,7 +151,7 @@ pub fn execute_payload_full_to_json_test() {
     |> execute.with_attachments([
       attachment.new_attachment("0", "banner.png"),
     ])
-    |> execute.with_flags(0)
+    |> execute.with_flags([])
     |> execute.with_thread_name("release-notes")
     |> execute.with_applied_tags([snowflake.new("1234567890")])
     |> execute.to_string
