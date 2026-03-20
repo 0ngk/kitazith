@@ -44,7 +44,7 @@ pub type ExecutePayload {
 pub type ExecutePayloadFlag {
   /// Include no embeds
   SuppressEmbeds
-  /// Do not triger a notification
+  /// Do not trigger a notification
   SuppressNotifications
   IsComponentsV2
 }
