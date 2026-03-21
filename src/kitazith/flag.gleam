@@ -18,7 +18,10 @@ pub type MessageFlag {
   IsComponentsV2
 }
 
-/// Learn more: [Message Resource - Documentation - Discord > Message Object > Message Flags](https://docs.discord.com/developers/resources/message#message-object-message-flags)
+/// Encode the supported message flags into a Discord message flag bitfield.
+///
+/// Learn more:
+///  [Message Resource - Documentation - Discord > Message Object > Message Flags](https://docs.discord.com/developers/resources/message#message-object-message-flags)
 pub fn to_int(message_flags: List(MessageFlag)) -> Int {
   message_flags
   |> list.map(message_flag_bit)
@@ -28,6 +31,9 @@ pub fn to_int(message_flags: List(MessageFlag)) -> Int {
 /// Decode a Discord message flag bitfield into the supported message flags.
 ///
 /// Unknown bits are ignored.
+///
+/// Learn more:
+/// [Message Resource - Documentation - Discord > Message Object > Message Flags](https://docs.discord.com/developers/resources/message#message-object-message-flags)
 pub fn from_int(bits: Int) -> List(MessageFlag) {
   supported_message_flags()
   |> list.filter_map(fn(message_flag) {
