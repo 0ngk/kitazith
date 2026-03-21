@@ -13,7 +13,8 @@ import kitazith/internal/json_helper
 /// Represents the three possible states of a field in an edit request:
 /// omit it, set it to a new value, or clear its current value.
 ///
-/// Learn more: [Webhook Resource - Documentation - Discord > Edit Webhook Message](https://docs.discord.com/developers/resources/webhook#edit-webhook-message)
+/// Learn more:
+///   [Webhook Resource - Documentation - Discord > Edit Webhook Message](https://docs.discord.com/developers/resources/webhook#edit-webhook-message)
 ///
 /// For Discord API v10 and later, `attachments` must contain all attachments that
 /// should be present after the edit, including retained and new attachments.

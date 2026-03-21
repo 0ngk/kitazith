@@ -4,7 +4,8 @@ import gleam/option.{type Option, None, Some}
 import kitazith/internal/json_helper
 import kitazith/timestamp
 
-/// Learn more: [Message Resource - Documentation - Discord > Embed Object](https://docs.discord.com/developers/resources/message#embed-object)
+/// Learn more:
+///   [Message Resource - Documentation - Discord > Embed Object](https://docs.discord.com/developers/resources/message#embed-object)
 ///
 /// Up to 6000 characters total across all `title`, `description`,
 /// `field.name`, `field.value`, `footer.text`, and `author.name` fields
@@ -34,7 +35,8 @@ pub type Embed {
   )
 }
 
-/// Learn more: [Message Resource - Documentation - Discord > Embed Footer Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-footer-structure)
+/// Learn more:
+///   [Message Resource - Documentation - Discord > Embed Footer Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-footer-structure)
 pub type EmbedFooter {
   EmbedFooter(
     /// Up to 2048 characters.
@@ -43,17 +45,20 @@ pub type EmbedFooter {
   )
 }
 
-/// Learn more: [Message Resource - Documentation - Discord > Embed Image Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-image-structure)
+/// Learn more:
+///   [Message Resource - Documentation - Discord > Embed Image Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-image-structure)
 pub type EmbedImage {
   EmbedImage(url: String)
 }
 
-/// Learn more: [Message Resource - Documentation - Discord > Embed Thumbnail Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-thumbnail-structure)
+/// Learn more:
+///   [Message Resource - Documentation - Discord > Embed Thumbnail Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-thumbnail-structure)
 pub type EmbedThumbnail {
   EmbedThumbnail(url: String)
 }
 
-/// Learn more: [Message Resource - Documentation - Discord > Embed Author Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-author-structure)
+/// Learn more:
+///   [Message Resource - Documentation - Discord > Embed Author Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-author-structure)
 pub type EmbedAuthor {
   EmbedAuthor(
     /// Up to 256 characters.
@@ -63,7 +68,8 @@ pub type EmbedAuthor {
   )
 }
 
-/// Learn more: [Message Resource - Documentation - Discord > Embed Field Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-field-structure)
+/// Learn more:
+///   [Message Resource - Documentation - Discord > Embed Field Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-field-structure)
 pub type EmbedField {
   EmbedField(
     /// Up to 256 characters.

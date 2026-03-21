@@ -2,7 +2,8 @@
 ////
 //// Each function takes a Snowflake (a unique identifier used by Discord) and returns a string formatted as a mention that can be used in messages.
 ////
-//// Learn more: [API Reference - Documentation - Discord > Message Formatting > Formats](https://docs.discord.com/developers/reference#message-formatting-formats)
+//// Learn more:
+////   [API Reference - Documentation - Discord > Message Formatting > Formats](https://docs.discord.com/developers/reference#message-formatting-formats)
 
 import gleam/string
 

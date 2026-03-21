@@ -1,7 +1,8 @@
 import gleam/int
 import gleam/list
 
-/// Learn more: [Message Resource - Documentation - Discord > Message Object > Message Flags](https://docs.discord.com/developers/resources/message#message-object-message-flags)
+/// Learn more:
+///   [Message Resource - Documentation - Discord > Message Object > Message Flags](https://docs.discord.com/developers/resources/message#message-object-message-flags)
 pub type MessageFlag {
   Crossposted
   IsCrosspost
@@ -21,7 +22,7 @@ pub type MessageFlag {
 /// Encode the supported message flags into a Discord message flag bitfield.
 ///
 /// Learn more:
-///  [Message Resource - Documentation - Discord > Message Object > Message Flags](https://docs.discord.com/developers/resources/message#message-object-message-flags)
+///   [Message Resource - Documentation - Discord > Message Object > Message Flags](https://docs.discord.com/developers/resources/message#message-object-message-flags)
 pub fn to_int(message_flags: List(MessageFlag)) -> Int {
   message_flags
   |> list.map(message_flag_bit)
@@ -33,7 +34,7 @@ pub fn to_int(message_flags: List(MessageFlag)) -> Int {
 /// Unknown bits are ignored.
 ///
 /// Learn more:
-/// [Message Resource - Documentation - Discord > Message Object > Message Flags](https://docs.discord.com/developers/resources/message#message-object-message-flags)
+///   [Message Resource - Documentation - Discord > Message Object > Message Flags](https://docs.discord.com/developers/resources/message#message-object-message-flags)
 pub fn from_int(bits: Int) -> List(MessageFlag) {
   supported_message_flags()
   |> list.filter_map(fn(message_flag) {

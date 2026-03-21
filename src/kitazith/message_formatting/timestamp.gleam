@@ -3,7 +3,8 @@ import gleam/string
 
 /// Discord message timestamp display styles.
 ///
-/// Learn more: [API Reference - Documentation - Discord > Message Formatting > Timestamp Styles](https://docs.discord.com/developers/reference#message-formatting-timestamp-styles)
+/// Learn more:
+///   [API Reference - Documentation - Discord > Message Formatting > Timestamp Styles](https://docs.discord.com/developers/reference#message-formatting-timestamp-styles)
 pub type Style {
   Default
   ShortTime

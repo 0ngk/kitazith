@@ -4,7 +4,8 @@ import gleam/option.{type Option, None, Some}
 import kitazith/internal/json_helper
 import kitazith/snowflake
 
-/// Learn more: [Message Resource - Documentation - Discord > Allowed Mentions Object](https://docs.discord.com/developers/resources/message#allowed-mentions-object)
+/// Learn more:
+///   [Message Resource - Documentation - Discord > Allowed Mentions Object](https://docs.discord.com/developers/resources/message#allowed-mentions-object)
 pub type AllowedMentions {
   AllowedMentions(
     parse: Option(List(AllowedMention)),
@@ -16,7 +17,8 @@ pub type AllowedMentions {
   )
 }
 
-/// Learn more: [Message Resource - Documentation - Discord > Allowed Mentions Object > Allowed Mention Types](https://docs.discord.com/developers/resources/message#allowed-mentions-object-allowed-mention-types)
+/// Learn more:
+///   [Message Resource - Documentation - Discord > Allowed Mentions Object > Allowed Mention Types](https://docs.discord.com/developers/resources/message#allowed-mentions-object-allowed-mention-types)
 pub type AllowedMention {
   Roles
   Users

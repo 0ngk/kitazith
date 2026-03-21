@@ -2,7 +2,8 @@ import gleam/json
 
 /// A Discord Snowflake ID.
 ///
-/// Learn more: [API Reference - Documentation - Discord > Snowflakes](https://docs.discord.com/developers/reference#snowflakes)
+/// Learn more:
+///   [API Reference - Documentation - Discord > Snowflakes](https://docs.discord.com/developers/reference#snowflakes)
 pub opaque type Snowflake {
   Snowflake(String)
 }

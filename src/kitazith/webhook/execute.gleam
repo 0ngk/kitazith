@@ -12,7 +12,8 @@ import kitazith/internal/json_helper
 import kitazith/poll
 import kitazith/snowflake
 
-/// Learn more: [Webhook Resource - Documentation - Discord > Execute Webhook > JSON/Form Params](https://docs.discord.com/developers/resources/webhook#execute-webhook-json/form-params)
+/// Learn more:
+///   [Webhook Resource - Documentation - Discord > Execute Webhook > JSON/Form Params](https://docs.discord.com/developers/resources/webhook#execute-webhook-json/form-params)
 pub type ExecutePayload {
   ExecutePayload(
     /// Up to 2000 characters.

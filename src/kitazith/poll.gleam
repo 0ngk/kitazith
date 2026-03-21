@@ -4,7 +4,8 @@ import gleam/option.{type Option, None, Some}
 import kitazith/internal/json_helper
 import kitazith/snowflake
 
-/// Learn more: [Poll Resource - Documentation - Discord > Poll Create Request Object](https://docs.discord.com/developers/resources/poll#poll-create-request-object)
+/// Learn more:
+///   [Poll Resource - Documentation - Discord > Poll Create Request Object](https://docs.discord.com/developers/resources/poll#poll-create-request-object)
 pub type Poll {
   Poll(
     question: PollQuestion,
@@ -17,7 +18,9 @@ pub type Poll {
   )
 }
 
-/// Learn more: [Poll Resource - Documentation - Discord > Poll Media Object](https://docs.discord.com/developers/resources/poll#poll-media-object)
+/// Learn more:
+///   [Poll Resource - Documentation - Discord > Poll Media Object](https://docs.discord.com/developers/resources/poll#poll-media-object)
+///
 /// Poll.question only supports text, while Poll.answers supports both text and emoji.
 pub type PollQuestion {
   PollQuestion(
@@ -26,12 +29,14 @@ pub type PollQuestion {
   )
 }
 
-/// Learn more: [Poll Resource - Documentation - Discord > Poll Answer Object](https://docs.discord.com/developers/resources/poll#poll-media-object)
+/// Learn more:
+///   [Poll Resource - Documentation - Discord > Poll Answer Object](https://docs.discord.com/developers/resources/poll#poll-media-object)
 pub type PollAnswer {
   PollAnswer(poll_media: PollMedia)
 }
 
-/// Learn more: [Poll Resource - Documentation - Discord > Poll Media Object](https://docs.discord.com/developers/resources/poll#poll-media-object)
+/// Learn more:
+///   [Poll Resource - Documentation - Discord > Poll Media Object](https://docs.discord.com/developers/resources/poll#poll-media-object)
 pub type PollMedia {
   PollMedia(
     /// Up to 55 characters for any answer.
@@ -40,7 +45,8 @@ pub type PollMedia {
   )
 }
 
-/// Learn more: Partial [Emoji Resource - Documentation - Discord > Emoji Object](https://docs.discord.com/developers/resources/emoji#emoji-object)
+/// Learn more: Partial
+///   [Emoji Resource - Documentation - Discord > Emoji Object](https://docs.discord.com/developers/resources/emoji#emoji-object)
 pub type PollEmoji {
   PollEmoji(
     /// Specify if custom emoji.

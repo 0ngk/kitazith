@@ -4,7 +4,8 @@ import gleam/time/timestamp as time_timestamp
 
 /// A type-safe RFC 3339 timestamp backed by `gleam_time`.
 ///
-/// Learn more: [API Reference - Documentation - Discord > ISO8601 Date/Time](https://docs.discord.com/developers/reference#iso8601-date%2Ftime)
+/// Learn more:
+///   [API Reference - Documentation - Discord > ISO8601 Date/Time](https://docs.discord.com/developers/reference#iso8601-date%2Ftime)
 pub opaque type Timestamp {
   Timestamp(inner: time_timestamp.Timestamp)
 }
