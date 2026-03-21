@@ -59,6 +59,30 @@ pub fn main() -> Nil {
 
 Further documentation can be found at <https://hexdocs.pm/kitazith>.
 
+## Decoding Execute Webhook Responses
+
+When `execute webhook` is called with `wait=true`, Discord returns a message object.
+`kitazith/webhook/message` decodes the minimal subset needed to read the created message IDs and supported flags.
+
+```gleam
+import gleam/option
+import kitazith/flag
+import kitazith/snowflake
+import kitazith/webhook/message
+
+pub fn parse_response() -> Nil {
+  let body =
+    "{\"id\":\"123\",\"channel_id\":\"456\",\"webhook_id\":\"789\",\"flags\":4}"
+
+  let assert Ok(decoded) = message.decode(body)
+
+  assert decoded.id == snowflake.new("123")
+  assert decoded.channel_id == snowflake.new("456")
+  assert decoded.webhook_id == option.Some(snowflake.new("789"))
+  assert decoded.flags == option.Some([flag.SuppressEmbeds])
+}
+```
+
 ## Discord Message Formatting
 
 `kitazith/timestamp` is for embed JSON timestamps. Message content formatting
