@@ -49,6 +49,7 @@ pub type EditPayload {
 }
 
 /// Learn more:
+///   [Webhook Resource - Documentation - Discord > Edit Webhook Message > JSON/Form Params](https://docs.discord.com/developers/resources/webhook#edit-webhook-message-json/form-params)
 pub type EditPayloadFlag {
   /// Include no embeds
   SuppressEmbeds
