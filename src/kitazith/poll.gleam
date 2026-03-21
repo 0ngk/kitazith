@@ -62,8 +62,8 @@ pub type PollEmoji {
 
 pub fn new_poll(question: PollQuestion, answers: List(PollAnswer)) -> Poll {
   Poll(
-    question: question,
-    answers: answers,
+    question:,
+    answers:,
     duration: None,
     allow_multiselect: None,
     layout_type: None,

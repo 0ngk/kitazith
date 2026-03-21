@@ -153,7 +153,7 @@ pub fn with_fields(embed: Embed, fields: List(EmbedField)) -> Embed {
 }
 
 pub fn new_footer(text: String) -> EmbedFooter {
-  EmbedFooter(text: text, icon_url: None)
+  EmbedFooter(text:, icon_url: None)
 }
 
 pub fn with_footer_icon_url(
@@ -164,7 +164,7 @@ pub fn with_footer_icon_url(
 }
 
 pub fn new_author(name: String) -> EmbedAuthor {
-  EmbedAuthor(name: name, url: None, icon_url: None)
+  EmbedAuthor(name:, url: None, icon_url: None)
 }
 
 pub fn with_author_url(author: EmbedAuthor, url: String) -> EmbedAuthor {
@@ -179,7 +179,7 @@ pub fn with_author_icon_url(
 }
 
 pub fn new_field(name: String, value: String) -> EmbedField {
-  EmbedField(name: name, value: value, inline: None)
+  EmbedField(name:, value:, inline: None)
 }
 
 pub fn with_field_inline(field: EmbedField, inline: Bool) -> EmbedField {

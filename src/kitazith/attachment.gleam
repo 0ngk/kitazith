@@ -13,7 +13,7 @@ pub type Attachment {
 }
 
 pub fn new_attachment(id: String, filename: String) -> Attachment {
-  Attachment(id: id, filename: filename, description: None)
+  Attachment(id:, filename:, description: None)
 }
 
 pub fn with_description(
