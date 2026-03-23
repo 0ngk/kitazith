@@ -178,7 +178,7 @@ pub fn with_author_icon_url(
   EmbedAuthor(..author, icon_url: Some(icon_url))
 }
 
-pub fn new_field(name: String, value: String) -> EmbedField {
+pub fn new_field(name name: String, value value: String) -> EmbedField {
   EmbedField(name:, value:, inline: None)
 }
 
