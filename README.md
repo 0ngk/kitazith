@@ -86,6 +86,7 @@ pub fn build_payload() -> execute.ExecutePayload {
 ## Decoding Execute Webhook Responses
 
 When `execute webhook` is called with `wait=true`, Discord returns a message object.
+
 `kitazith/webhook/message` decodes the minimal subset needed to read the created message IDs and supported flags.
 
 ```gleam
@@ -109,8 +110,9 @@ pub fn parse_response() -> Nil {
 
 ## Discord Message Formatting
 
-`kitazith/timestamp` is for embed JSON timestamps. Message content formatting
-helpers live under `kitazith/message_formatting`.
+`kitazith/timestamp` is for embed JSON timestamps.
+
+Message content formatting helpers live under `kitazith/message_formatting`.
 
 ```gleam
 import kitazith/message_formatting/emoji
