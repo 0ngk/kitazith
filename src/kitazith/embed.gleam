@@ -7,13 +7,15 @@ import kitazith/timestamp
 /// Learn more:
 ///   [Message Resource - Documentation - Discord > Embed Object](https://docs.discord.com/developers/resources/message#embed-object)
 ///
+/// ## Total number of characters limitation
 /// Up to 6000 characters total across all `title`, `description`,
 /// `field.name`, `field.value`, `footer.text`, and `author.name` fields
 /// in all embeds per message.
 ///
 /// Source: [Message Resource - Documentation - Discord > Embed Object > Embed Limits](https://docs.discord.com/developers/resources/message#embed-object-embed-limits)
 ///
-/// `type`, `provider`, and `video` filds are not supported for the webhook embed objects.
+/// ## Limited fields are available
+/// `type`, `provider`, and `video` fields are not supported for the webhook embed objects.
 ///
 /// Source: [Webhook Resource - Documentation - Discord > Execute Webhook](https://docs.discord.com/developers/resources/webhook#execute-webhook)
 pub type Embed {
