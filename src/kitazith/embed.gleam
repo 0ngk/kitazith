@@ -39,7 +39,7 @@ pub type Embed {
 ///   [Message Resource - Documentation - Discord > Embed Footer Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-footer-structure)
 pub type EmbedFooter {
   EmbedFooter(
-    /// Up to 2048 characters.
+    /// At least 1 character and up to 2048 characters.
     text: String,
     icon_url: Option(String),
   )
@@ -61,7 +61,7 @@ pub type EmbedThumbnail {
 ///   [Message Resource - Documentation - Discord > Embed Author Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-author-structure)
 pub type EmbedAuthor {
   EmbedAuthor(
-    /// Up to 256 characters.
+    /// At least 1 character and up to 256 characters.
     name: String,
     url: Option(String),
     icon_url: Option(String),
@@ -72,9 +72,9 @@ pub type EmbedAuthor {
 ///   [Message Resource - Documentation - Discord > Embed Field Structure](https://docs.discord.com/developers/resources/message#embed-object-embed-field-structure)
 pub type EmbedField {
   EmbedField(
-    /// Up to 256 characters.
+    /// At least 1 character and up to 256 characters.
     name: String,
-    /// Up to 1024 characters.
+    /// At least 1 character and up to 1024 characters.
     value: String,
     inline: Option(Bool),
   )

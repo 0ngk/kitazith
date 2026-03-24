@@ -24,7 +24,7 @@ pub type Poll {
 /// Poll.question only supports text, while Poll.answers supports both text and emoji.
 pub type PollQuestion {
   PollQuestion(
-    /// Up to 300 characters.
+    /// At least 1 character and up to 300 characters.
     text: String,
   )
 }
@@ -39,7 +39,7 @@ pub type PollAnswer {
 ///   [Poll Resource - Documentation - Discord > Poll Media Object](https://docs.discord.com/developers/resources/poll#poll-media-object)
 pub type PollMedia {
   PollMedia(
-    /// Up to 55 characters for any answer.
+    /// If specified, at least 1 character and up to 55 characters for any answer.
     text: Option(String),
     emoji: Option(PollEmoji),
   )

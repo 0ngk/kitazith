@@ -34,6 +34,7 @@ pub type ExecutePayload {
     components: Option(List(component.Component)),
     attachments: Option(List(attachment.Attachment)),
     flags: Option(List(ExecutePayloadFlag)),
+    /// If specified, at least 1 character and up to 100 characters.
     thread_name: Option(String),
     /// Snowflake IDs of tags applied to the message
     applied_tags: Option(List(snowflake.Snowflake)),
