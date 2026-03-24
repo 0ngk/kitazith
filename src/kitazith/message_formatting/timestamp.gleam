@@ -19,7 +19,7 @@ pub type Style {
 }
 
 /// Format Unix seconds as a Discord message timestamp.
-pub fn format(seconds: Int, style: Style) -> String {
+pub fn format(seconds seconds: Int, style style: Style) -> String {
   case style {
     Default -> string.concat(["<t:", int.to_string(seconds), ">"])
     _ ->
@@ -35,7 +35,7 @@ pub fn format(seconds: Int, style: Style) -> String {
 
 /// Format Unix seconds using Discord's default timestamp rendering.
 pub fn default(seconds: Int) -> String {
-  format(seconds, Default)
+  format(seconds: seconds, style: Default)
 }
 
 fn style_code(style: Style) -> String {

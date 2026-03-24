@@ -60,7 +60,10 @@ pub type PollEmoji {
   )
 }
 
-pub fn new_poll(question: PollQuestion, answers: List(PollAnswer)) -> Poll {
+pub fn new_poll(
+  question question: PollQuestion,
+  answers answers: List(PollAnswer),
+) -> Poll {
   Poll(
     question:,
     answers:,
@@ -70,7 +73,7 @@ pub fn new_poll(question: PollQuestion, answers: List(PollAnswer)) -> Poll {
   )
 }
 
-pub fn with_duration(poll: Poll, duration: Int) -> Poll {
+pub fn with_duration(poll: Poll, hours duration: Int) -> Poll {
   Poll(..poll, duration: Some(duration))
 }
 

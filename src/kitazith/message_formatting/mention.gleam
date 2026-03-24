@@ -21,6 +21,6 @@ pub fn channel(snowflake: Snowflake) -> String {
   string.concat(["<#", to_string(snowflake), ">"])
 }
 
-pub fn command(name: String, snowflake: Snowflake) -> String {
+pub fn command(name name: String, id snowflake: Snowflake) -> String {
   string.concat(["</", name, ":", to_string(snowflake), ">"])
 }

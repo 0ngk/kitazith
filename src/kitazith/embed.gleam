@@ -120,15 +120,15 @@ pub fn with_color(embed: Embed, color: Int) -> Embed {
 /// ## Examples
 ///
 /// ```gleam
-/// color_from_rgb(255, 0, 0)
+/// color_from_rgb(red: 255, green: 0, blue: 0)
 /// // -> 0xFF0000 (== 16711680)
 /// ```
 ///
 /// ```gleam
 /// embed.new_embed()
-/// |> embed.with_color(embed.color_from_rgb(88, 101, 242))
+/// |> embed.with_color(embed.color_from_rgb(red: 88, green: 101, blue: 242))
 /// ```
-pub fn color_from_rgb(red: Int, green: Int, blue: Int) -> Int {
+pub fn color_from_rgb(red red: Int, green green: Int, blue blue: Int) -> Int {
   red * 65_536 + green * 256 + blue
 }
 

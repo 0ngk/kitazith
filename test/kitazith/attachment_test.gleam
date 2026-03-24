@@ -5,7 +5,7 @@ import kitazith/attachment
 
 pub fn builder_attachment_test() {
   let a =
-    attachment.new_attachment("0", "banner.png")
+    attachment.new_attachment(id: "0", filename: "banner.png")
     |> attachment.with_description("Release banner")
 
   assert a.id == "0"
@@ -15,7 +15,7 @@ pub fn builder_attachment_test() {
 
 pub fn attachment_to_json_test() {
   let result =
-    attachment.new_attachment("0", "banner.png")
+    attachment.new_attachment(id: "0", filename: "banner.png")
     |> attachment.with_description("Release banner")
     |> attachment.to_json
     |> json.to_string

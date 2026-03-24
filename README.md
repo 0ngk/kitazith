@@ -54,9 +54,9 @@ pub fn build_payload() -> execute.ExecutePayload {
     embed.new_embed()
     |> embed.with_title("Release Status")
     |> embed.with_description("The build is green and ready to ship.")
-    |> embed.with_color(embed.color_from_rgb(87, 242, 135))
+    |> embed.with_color(embed.color_from_rgb(red: 87, green: 242, blue: 135))
     |> embed.with_fields([
-      embed.new_field("Status", "🟢 Green")
+      embed.new_field(name: "Status", value: "🟢 Green")
       |> embed.with_field_inline(True),
     ]),
   ])
@@ -77,7 +77,7 @@ pub fn build_payload() -> execute.ExecutePayload {
         |> poll.with_poll_media_text("Need one more review"),
       ),
     ])
-    |> poll.with_duration(24)
+    |> poll.with_duration(hours: 24)
     |> poll.with_allow_multiselect(False),
   )
 }
@@ -124,11 +124,14 @@ pub fn user_tag() -> String {
 }
 
 pub fn eta() -> String {
-  message_timestamp.format(1_773_654_660, message_timestamp.RelativeTime)
+  message_timestamp.format(
+    seconds: 1_773_654_660,
+    style: message_timestamp.RelativeTime,
+  )
 }
 
 pub fn party() -> String {
-  emoji.animated("blobdance", snowflake.new("1234567890"))
+  emoji.animated(name: "blobdance", id: snowflake.new("1234567890"))
 }
 
 pub fn server_guide() -> String {

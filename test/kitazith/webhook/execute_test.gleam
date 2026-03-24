@@ -149,7 +149,7 @@ pub fn execute_payload_full_to_json_test() {
       component.raw(json.object([#("type", json.int(1))])),
     ])
     |> execute.with_attachments([
-      attachment.new_attachment("0", "banner.png"),
+      attachment.new_attachment(id: "0", filename: "banner.png"),
     ])
     |> execute.with_flags([])
     |> execute.with_thread_name("release-notes")

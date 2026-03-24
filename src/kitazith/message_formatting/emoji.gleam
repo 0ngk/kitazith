@@ -6,7 +6,7 @@ import kitazith/snowflake.{type Snowflake, to_string}
 ///
 /// Learn more:
 ///   [API Reference - Documentation - Discord > Message Formatting > Formats](https://docs.discord.com/developers/reference#message-formatting)
-pub fn custom(name: String, id: Snowflake) -> String {
+pub fn custom(name name: String, id id: Snowflake) -> String {
   string.concat(["<:", name, ":", to_string(id), ">"])
 }
 
@@ -14,6 +14,6 @@ pub fn custom(name: String, id: Snowflake) -> String {
 ///
 /// Learn more:
 ///   [API Reference - Documentation - Discord > Message Formatting > Formats](https://docs.discord.com/developers/reference#message-formatting)
-pub fn animated(name: String, id: Snowflake) -> String {
+pub fn animated(name name: String, id id: Snowflake) -> String {
   string.concat(["<a:", name, ":", to_string(id), ">"])
 }

@@ -5,12 +5,12 @@ import kitazith/embed
 import kitazith/test_fixtures
 
 pub fn color_from_rgb_test() {
-  assert embed.color_from_rgb(255, 0, 0) == 0xFF0000
-  assert embed.color_from_rgb(0, 255, 0) == 0x00FF00
-  assert embed.color_from_rgb(0, 0, 255) == 0x0000FF
-  assert embed.color_from_rgb(88, 101, 242) == 5_793_266
-  assert embed.color_from_rgb(0, 0, 0) == 0
-  assert embed.color_from_rgb(255, 255, 255) == 0xFFFFFF
+  assert embed.color_from_rgb(red: 255, green: 0, blue: 0) == 0xFF0000
+  assert embed.color_from_rgb(red: 0, green: 255, blue: 0) == 0x00FF00
+  assert embed.color_from_rgb(red: 0, green: 0, blue: 255) == 0x0000FF
+  assert embed.color_from_rgb(red: 88, green: 101, blue: 242) == 5_793_266
+  assert embed.color_from_rgb(red: 0, green: 0, blue: 0) == 0
+  assert embed.color_from_rgb(red: 255, green: 255, blue: 255) == 0xFFFFFF
 }
 
 pub fn builder_embed_test() {
@@ -35,7 +35,7 @@ pub fn builder_embed_test() {
       |> embed.with_author_icon_url("https://example.com/avatar.png"),
     )
     |> embed.with_fields([
-      embed.new_field("Status", "Green")
+      embed.new_field(name: "Status", value: "Green")
       |> embed.with_field_inline(True),
     ])
 
@@ -77,7 +77,7 @@ pub fn embed_to_json_test() {
       |> embed.with_author_icon_url("https://example.com/avatar.png"),
     )
     |> embed.with_fields([
-      embed.new_field("Status", "Green")
+      embed.new_field(name: "Status", value: "Green")
       |> embed.with_field_inline(True),
     ])
     |> embed.to_json

@@ -7,5 +7,5 @@ pub fn message_mention_format_test() {
   assert mention.user(id) == "<@42>"
   assert mention.role(id) == "<@&42>"
   assert mention.channel(id) == "<#42>"
-  assert mention.command("ship", id) == "</ship:42>"
+  assert mention.command(name: "ship", id: id) == "</ship:42>"
 }

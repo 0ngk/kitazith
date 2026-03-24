@@ -144,7 +144,7 @@ pub fn edit_payload_full_to_json_test() {
       |> embed.with_title("Release"),
     ])
     |> edit.with_attachments([
-      attachment.new_attachment("0", "banner.png"),
+      attachment.new_attachment(id: "0", filename: "banner.png"),
     ])
     |> edit.with_components([
       component.raw(json.object([#("type", json.int(1))])),
