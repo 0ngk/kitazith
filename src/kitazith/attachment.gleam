@@ -7,7 +7,7 @@ pub type Attachment {
   Attachment(
     id: String,
     filename: String,
-    /// Up to 1024 characters.
+    /// At least 1 character and up to 1024 characters.
     description: Option(String),
   )
 }
