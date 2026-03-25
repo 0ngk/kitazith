@@ -1,6 +1,7 @@
 import gleam/json
 import gleam/option.{Some}
 
+import kitazith/attachment
 import kitazith/embed
 import kitazith/test_fixtures
 
@@ -85,4 +86,21 @@ pub fn embed_to_json_test() {
 
   assert result
     == "{\"title\":\"Release\",\"description\":\"The build is ready.\",\"timestamp\":\"2026-03-15T09:30:00Z\",\"color\":5792266,\"footer\":{\"text\":\"kitazith\",\"icon_url\":\"https://example.com/footer.png\"},\"image\":{\"url\":\"https://example.com/image.png\"},\"author\":{\"name\":\"Bot\",\"icon_url\":\"https://example.com/avatar.png\"},\"fields\":[{\"name\":\"Status\",\"value\":\"Green\",\"inline\":true}]}"
+}
+
+pub fn embed_to_json_with_attachment_thumbnail_test() {
+  let result =
+    embed.new_embed()
+    |> embed.with_thumbnail(
+      embed.EmbedThumbnail(
+        url: attachment.to_embed_url(attachment.new_attachment(
+          id: 0,
+          filename: "thumb.png",
+        )),
+      ),
+    )
+    |> embed.to_json
+    |> json.to_string
+
+  assert result == "{\"thumbnail\":{\"url\":\"attachment://thumb.png\"}}"
 }

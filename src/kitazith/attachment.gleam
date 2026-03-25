@@ -23,6 +23,14 @@ pub fn with_description(
   Attachment(..attachment, description: Some(description))
 }
 
+/// Format an attachment for use in embed image or thumbnail URLs.
+///
+/// Discord accepts `attachment://filename` to reference uploaded attachments
+///   from embeds in the same message payload.
+pub fn to_embed_url(attachment: Attachment) -> String {
+  "attachment://" <> attachment.filename
+}
+
 pub fn to_json(a: Attachment) -> json.Json {
   json_helper.object_omit_none([
     Some(#("id", json.int(a.id))),

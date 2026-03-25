@@ -83,6 +83,30 @@ pub fn build_payload() -> execute.ExecutePayload {
 }
 ```
 
+## Using Attachments Within Embeds
+
+Discord embeds can reference files uploaded in the same payload with the
+`attachment://filename` syntax.
+
+```gleam
+import kitazith/attachment
+import kitazith/embed
+import kitazith/webhook/execute
+
+pub fn build_payload_with_thumbnail() -> execute.ExecutePayload {
+  let thumbnail = attachment.new_attachment(id: 0, filename: "thumb.png")
+
+  execute.new_execute_payload()
+  |> execute.with_attachments([thumbnail])
+  |> execute.with_embeds([
+    embed.new_embed()
+    |> embed.with_thumbnail(
+      embed.EmbedThumbnail(url: attachment.to_embed_url(thumbnail)),
+    ),
+  ])
+}
+```
+
 ## Decoding Execute Webhook Responses
 
 When `execute webhook` is called with `wait=true`, Discord returns a message object.

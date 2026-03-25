@@ -23,3 +23,11 @@ pub fn attachment_to_json_test() {
   assert result
     == "{\"id\":0,\"filename\":\"banner.png\",\"description\":\"Release banner\"}"
 }
+
+pub fn attachment_to_embed_url_test() {
+  let result =
+    attachment.new_attachment(id: 0, filename: "banner.png")
+    |> attachment.to_embed_url
+
+  assert result == "attachment://banner.png"
+}
