@@ -149,7 +149,7 @@ pub fn execute_payload_full_to_json_test() {
       component.raw(json.object([#("type", json.int(1))])),
     ])
     |> execute.with_attachments([
-      attachment.new_attachment(id: "0", filename: "banner.png"),
+      attachment.new_attachment(id: 0, filename: "banner.png"),
     ])
     |> execute.with_flags([])
     |> execute.with_thread_name("release-notes")
@@ -157,5 +157,5 @@ pub fn execute_payload_full_to_json_test() {
     |> execute.to_string
 
   assert result
-    == "{\"content\":\"Hello\",\"username\":\"kitazith\",\"tts\":false,\"embeds\":[{\"title\":\"Release\"}],\"allowed_mentions\":{\"parse\":[\"users\"]},\"components\":[{\"type\":1}],\"attachments\":[{\"id\":\"0\",\"filename\":\"banner.png\"}],\"flags\":0,\"thread_name\":\"release-notes\",\"applied_tags\":[\"1234567890\"]}"
+    == "{\"content\":\"Hello\",\"username\":\"kitazith\",\"tts\":false,\"embeds\":[{\"title\":\"Release\"}],\"allowed_mentions\":{\"parse\":[\"users\"]},\"components\":[{\"type\":1}],\"attachments\":[{\"id\":0,\"filename\":\"banner.png\"}],\"flags\":0,\"thread_name\":\"release-notes\",\"applied_tags\":[\"1234567890\"]}"
 }

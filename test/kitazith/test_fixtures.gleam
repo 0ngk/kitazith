@@ -11,7 +11,7 @@ import kitazith/timestamp
 
 pub fn sample_attachment() -> attachment.Attachment {
   attachment.Attachment(
-    id: "0",
+    id: 0,
     filename: "banner.png",
     description: Some("Release banner"),
   )

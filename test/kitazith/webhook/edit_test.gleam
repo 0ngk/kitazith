@@ -144,7 +144,7 @@ pub fn edit_payload_full_to_json_test() {
       |> embed.with_title("Release"),
     ])
     |> edit.with_attachments([
-      attachment.new_attachment(id: "0", filename: "banner.png"),
+      attachment.new_attachment(id: 0, filename: "banner.png"),
     ])
     |> edit.with_components([
       component.raw(json.object([#("type", json.int(1))])),
@@ -157,5 +157,5 @@ pub fn edit_payload_full_to_json_test() {
     |> edit.to_string
 
   assert result
-    == "{\"content\":\"Hello\",\"embeds\":[{\"title\":\"Release\"}],\"attachments\":[{\"id\":\"0\",\"filename\":\"banner.png\"}],\"components\":[{\"type\":1}],\"allowed_mentions\":{\"parse\":[\"users\"]},\"flags\":0}"
+    == "{\"content\":\"Hello\",\"embeds\":[{\"title\":\"Release\"}],\"attachments\":[{\"id\":0,\"filename\":\"banner.png\"}],\"components\":[{\"type\":1}],\"allowed_mentions\":{\"parse\":[\"users\"]},\"flags\":0}"
 }
