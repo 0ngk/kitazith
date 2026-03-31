@@ -31,11 +31,12 @@ import kitazith/webhook/execute
 
 pub fn main() {
   let assert Ok(base_req) = request.to(webhook_url())
+  let assert Ok(payload) = build_payload() |> execute.validate
   let req =
     base_req
     |> request.prepend_header("content-type", "application/json")
     |> request.set_method(http.Post)
-    |> request.set_body(build_payload() |> execute.to_string)
+    |> request.set_body(payload |> execute.to_string)
   use resp <- result.try(httpc.send(req))
   assert resp.status == 204
   Ok(resp)
@@ -82,6 +83,14 @@ pub fn build_payload() -> execute.ExecutePayload {
   )
 }
 ```
+
+`kitazith/webhook/execute.validate` and `kitazith/webhook/edit.validate`
+can be used before serialization to catch Discord payload constraint violations
+such as oversized embeds, empty required strings, missing attachment
+references, or duplicate attachment filenames.
+
+Each error includes a `reason` for programmatic matching, and
+`kitazith/validation.message` can be used to render a human-readable message.
 
 ## Using Attachments Within Embeds
 

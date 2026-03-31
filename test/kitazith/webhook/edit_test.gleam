@@ -1,10 +1,15 @@
 import gleam/json
+import gleam/list
+import gleam/option.{None, Some}
+import gleam/string
 
 import kitazith/allowed_mentions
 import kitazith/attachment
 import kitazith/component
 import kitazith/embed
+import kitazith/snowflake
 import kitazith/test_fixtures
+import kitazith/validation
 import kitazith/webhook/edit
 
 pub fn new_edit_payload_starts_empty_test() {
@@ -158,4 +163,104 @@ pub fn edit_payload_full_to_json_test() {
 
   assert result
     == "{\"content\":\"Hello\",\"embeds\":[{\"title\":\"Release\"}],\"attachments\":[{\"id\":0,\"filename\":\"banner.png\"}],\"components\":[{\"type\":1}],\"allowed_mentions\":{\"parse\":[\"users\"]},\"flags\":0}"
+}
+
+pub fn edit_payload_validate_success_test() {
+  let payload =
+    edit.new_edit_payload()
+    |> edit.with_embeds([
+      embed.new_embed()
+      |> embed.with_thumbnail(
+        embed.EmbedThumbnail(
+          url: attachment.to_embed_url(attachment.new_attachment(
+            id: 0,
+            filename: "thumb.png",
+          )),
+        ),
+      ),
+    ])
+    |> edit.with_attachments([
+      attachment.new_attachment(id: 0, filename: "thumb.png"),
+    ])
+
+  assert edit.validate(payload) == Ok(payload)
+}
+
+pub fn edit_payload_validate_attachment_reference_after_clear_test() {
+  let result =
+    edit.new_edit_payload()
+    |> edit.clear_attachments()
+    |> edit.with_embeds([
+      embed.new_embed()
+      |> embed.with_thumbnail(embed.EmbedThumbnail(
+        url: "attachment://thumb.png",
+      )),
+    ])
+    |> edit.validate
+
+  assert result
+    == Error([
+      validation.ValidationError(
+        path: "embeds[0].thumbnail.url",
+        reason: validation.MissingAttachmentReference("thumb.png"),
+      ),
+    ])
+}
+
+pub fn edit_payload_validate_embed_and_mentions_constraints_test() {
+  let result =
+    edit.new_edit_payload()
+    |> edit.with_embeds([
+      embed.new_embed()
+      |> embed.with_footer(embed.EmbedFooter(text: "", icon_url: None))
+      |> embed.with_description(string.repeat("a", times: 4097)),
+    ])
+    |> edit.with_allowed_mentions(allowed_mentions.AllowedMentions(
+      parse: None,
+      roles: None,
+      users: Some(list.repeat(snowflake.new("42"), times: 101)),
+      replied_user: None,
+    ))
+    |> edit.validate
+
+  assert result
+    == Error([
+      validation.ValidationError(
+        path: "embeds[0].description",
+        reason: validation.StringLengthExceeded(max: 4096, actual: 4097),
+      ),
+      validation.ValidationError(
+        path: "embeds[0].footer.text",
+        reason: validation.StringLengthOutOfRange(min: 1, max: 2048, actual: 0),
+      ),
+      validation.ValidationError(
+        path: "allowed_mentions.users",
+        reason: validation.ListLengthExceeded(
+          max: 100,
+          actual: 101,
+          item_label: "user ids",
+        ),
+      ),
+    ])
+}
+
+pub fn edit_payload_validate_duplicate_attachment_filename_test() {
+  let result =
+    edit.new_edit_payload()
+    |> edit.with_attachments([
+      attachment.new_attachment(id: 0, filename: "thumb.png"),
+      attachment.new_attachment(id: 1, filename: "thumb.png"),
+    ])
+    |> edit.validate
+
+  assert result
+    == Error([
+      validation.ValidationError(
+        path: "attachments",
+        reason: validation.DuplicateAttachmentFilename(
+          filename: "thumb.png",
+          indexes: [0, 1],
+        ),
+      ),
+    ])
 }

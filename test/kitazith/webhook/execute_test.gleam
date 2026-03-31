@@ -1,12 +1,15 @@
 import gleam/json
 import gleam/option.{None, Some}
+import gleam/string
 
 import kitazith/allowed_mentions
 import kitazith/attachment
 import kitazith/component
 import kitazith/embed
+import kitazith/poll
 import kitazith/snowflake
 import kitazith/test_fixtures
+import kitazith/validation
 import kitazith/webhook/execute
 
 pub fn new_execute_payload_starts_empty_test() {
@@ -158,4 +161,154 @@ pub fn execute_payload_full_to_json_test() {
 
   assert result
     == "{\"content\":\"Hello\",\"username\":\"kitazith\",\"tts\":false,\"embeds\":[{\"title\":\"Release\"}],\"allowed_mentions\":{\"parse\":[\"users\"]},\"components\":[{\"type\":1}],\"attachments\":[{\"id\":0,\"filename\":\"banner.png\"}],\"flags\":0,\"thread_name\":\"release-notes\",\"applied_tags\":[\"1234567890\"]}"
+}
+
+pub fn execute_payload_validate_success_test() {
+  let payload =
+    execute.new_execute_payload()
+    |> execute.with_content("Hello")
+    |> execute.with_username("kitazith")
+    |> execute.with_embeds([
+      embed.new_embed()
+      |> embed.with_thumbnail(
+        embed.EmbedThumbnail(
+          url: attachment.to_embed_url(attachment.new_attachment(
+            id: 0,
+            filename: "thumb.png",
+          )),
+        ),
+      ),
+    ])
+    |> execute.with_attachments([
+      attachment.new_attachment(id: 0, filename: "thumb.png"),
+    ])
+    |> execute.with_poll(test_fixtures.sample_poll())
+
+  assert execute.validate(payload) == Ok(payload)
+}
+
+pub fn execute_payload_validate_direct_constructor_error_test() {
+  let result =
+    execute.ExecutePayload(
+      content: None,
+      username: Some(""),
+      avatar_url: None,
+      tts: None,
+      embeds: None,
+      allowed_mentions: None,
+      components: None,
+      attachments: None,
+      flags: None,
+      thread_name: None,
+      applied_tags: None,
+      poll: None,
+    )
+    |> execute.validate
+
+  assert result
+    == Error([
+      validation.ValidationError(
+        path: "username",
+        reason: validation.StringLengthOutOfRange(min: 1, max: 80, actual: 0),
+      ),
+    ])
+}
+
+pub fn execute_payload_validate_attachment_reference_error_test() {
+  let result =
+    execute.new_execute_payload()
+    |> execute.with_embeds([
+      embed.new_embed()
+      |> embed.with_thumbnail(embed.EmbedThumbnail(
+        url: "attachment://thumb.png",
+      )),
+    ])
+    |> execute.validate
+
+  assert result
+    == Error([
+      validation.ValidationError(
+        path: "embeds[0].thumbnail.url",
+        reason: validation.MissingAttachmentReference("thumb.png"),
+      ),
+    ])
+}
+
+pub fn execute_payload_validate_embed_total_character_limit_test() {
+  let result =
+    execute.new_execute_payload()
+    |> execute.with_embeds([
+      embed.new_embed()
+        |> embed.with_description(string.repeat("a", times: 4000)),
+      embed.new_embed()
+        |> embed.with_description(string.repeat("b", times: 2001)),
+    ])
+    |> execute.validate
+
+  assert result
+    == Error([
+      validation.ValidationError(
+        path: "embeds",
+        reason: validation.AggregateCharacterLimitExceeded(
+          limit_label: "embed_total_characters",
+          max: 6000,
+          actual: 6001,
+        ),
+      ),
+    ])
+}
+
+pub fn execute_payload_validate_poll_constraints_test() {
+  let result =
+    execute.new_execute_payload()
+    |> execute.with_poll(poll.Poll(
+      question: poll.PollQuestion(text: ""),
+      answers: [
+        poll.PollAnswer(poll_media: poll.PollMedia(
+          text: Some("Option A"),
+          emoji: None,
+        )),
+      ],
+      duration: Some(769),
+      allow_multiselect: Some(False),
+      layout_type: None,
+    ))
+    |> execute.validate
+
+  assert result
+    == Error([
+      validation.ValidationError(
+        path: "poll.question.text",
+        reason: validation.StringLengthOutOfRange(min: 1, max: 300, actual: 0),
+      ),
+      validation.ValidationError(
+        path: "poll.duration",
+        reason: validation.NumericMaximumExceeded(
+          max: 768,
+          actual: 769,
+          unit: "hours",
+        ),
+      ),
+    ])
+}
+
+pub fn execute_payload_validate_duplicate_attachment_filename_test() {
+  let result =
+    execute.new_execute_payload()
+    |> execute.with_attachments([
+      attachment.new_attachment(id: 0, filename: "thumb.png"),
+      attachment.new_attachment(id: 1, filename: "thumb.png"),
+    ])
+    |> execute.validate
+
+  assert result
+    == Error([
+      validation.ValidationError(
+        path: "attachments",
+        reason: validation.DuplicateAttachmentFilename(
+          filename: "thumb.png",
+          indexes: [0, 1],
+        ),
+      ),
+    ])
 }

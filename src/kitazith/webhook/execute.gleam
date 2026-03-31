@@ -9,8 +9,10 @@ import kitazith/component
 import kitazith/embed
 import kitazith/flag
 import kitazith/internal/json_helper
+import kitazith/internal/validation_helper
 import kitazith/poll
 import kitazith/snowflake
+import kitazith/validation
 
 /// Learn more:
 ///   [Webhook Resource - Documentation - Discord > Execute Webhook > JSON/Form Params](https://docs.discord.com/developers/resources/webhook#execute-webhook-json/form-params)
@@ -141,6 +143,85 @@ pub fn with_applied_tags(
 
 pub fn with_poll(payload: ExecutePayload, poll: poll.Poll) -> ExecutePayload {
   ExecutePayload(..payload, poll: Some(poll))
+}
+
+pub fn validate(
+  payload: ExecutePayload,
+) -> Result(ExecutePayload, List(validation.ValidationError)) {
+  let attachment_filenames = case payload.attachments {
+    Some(attachments) -> validation_helper.attachment_filenames(attachments)
+    None -> []
+  }
+
+  let errors =
+    list.flatten([
+      case payload.content {
+        Some(content) ->
+          validation_helper.validate_string_max_length(
+            "content",
+            content,
+            max: 2000,
+          )
+
+        None -> []
+      },
+      case payload.username {
+        Some(username) ->
+          validation_helper.validate_string_length(
+            "username",
+            username,
+            min: 1,
+            max: 80,
+          )
+
+        None -> []
+      },
+      case payload.thread_name {
+        Some(thread_name) ->
+          validation_helper.validate_string_length(
+            "thread_name",
+            thread_name,
+            min: 1,
+            max: 100,
+          )
+
+        None -> []
+      },
+      case payload.embeds {
+        Some(embeds) ->
+          validation_helper.validate_embeds(
+            "embeds",
+            embeds,
+            attachment_filenames: Some(attachment_filenames),
+          )
+
+        None -> []
+      },
+      case payload.allowed_mentions {
+        Some(allowed_mentions) ->
+          validation_helper.validate_allowed_mentions(
+            "allowed_mentions",
+            allowed_mentions,
+          )
+
+        None -> []
+      },
+      case payload.attachments {
+        Some(attachments) ->
+          validation_helper.validate_attachments("attachments", attachments)
+
+        None -> []
+      },
+      case payload.poll {
+        Some(poll) -> validation_helper.validate_poll("poll", poll)
+        None -> []
+      },
+    ])
+
+  case errors {
+    [] -> Ok(payload)
+    _ -> Error(errors)
+  }
 }
 
 pub fn to_json(payload: ExecutePayload) -> json.Json {

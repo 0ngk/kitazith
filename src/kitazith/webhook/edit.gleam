@@ -9,6 +9,8 @@ import kitazith/component
 import kitazith/embed
 import kitazith/flag
 import kitazith/internal/json_helper
+import kitazith/internal/validation_helper
+import kitazith/validation
 
 /// Represents the three possible states of a field in an edit request:
 /// omit it, set it to a new value, or clear its current value.
@@ -128,6 +130,66 @@ pub fn with_flags(
 
 pub fn clear_flags(payload: EditPayload) -> EditPayload {
   EditPayload(..payload, flags: Clear)
+}
+
+pub fn validate(
+  payload: EditPayload,
+) -> Result(EditPayload, List(validation.ValidationError)) {
+  let attachment_filenames = case payload.attachments {
+    Set(attachments) ->
+      Some(validation_helper.attachment_filenames(attachments))
+    Clear -> Some([])
+    Omit -> None
+  }
+
+  let errors =
+    list.flatten([
+      case payload.content {
+        Set(content) ->
+          validation_helper.validate_string_max_length(
+            "content",
+            content,
+            max: 2000,
+          )
+
+        _ -> []
+      },
+      case payload.embeds {
+        Set(embeds) ->
+          validation_helper.validate_embeds(
+            "embeds",
+            embeds,
+            attachment_filenames: attachment_filenames,
+          )
+
+        _ -> []
+      },
+      case payload.attachments {
+        Set(attachments) ->
+          validation_helper.validate_attachments("attachments", attachments)
+
+        _ -> []
+      },
+      case payload.allowed_mentions {
+        Set(allowed_mentions) ->
+          validation_helper.validate_allowed_mentions(
+            "allowed_mentions",
+            allowed_mentions,
+          )
+
+        _ -> []
+      },
+      case payload.flags {
+        Set(_) -> []
+        Clear -> []
+        Omit -> []
+      },
+    ])
+
+  case errors {
+    [] -> Ok(payload)
+    _ -> Error(errors)
+  }
 }
 
 pub fn to_json(payload: EditPayload) -> json.Json {

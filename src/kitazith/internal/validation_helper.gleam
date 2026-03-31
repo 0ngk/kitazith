@@ -1,0 +1,529 @@
+import gleam/int
+import gleam/list
+import gleam/option.{type Option, None, Some}
+import gleam/string
+
+import kitazith/allowed_mentions
+import kitazith/attachment
+import kitazith/embed
+import kitazith/poll
+import kitazith/validation
+
+pub fn attachment_filenames(
+  attachments: List(attachment.Attachment),
+) -> List(String) {
+  attachments |> list.map(fn(attachment) { attachment.filename })
+}
+
+pub fn validate_string_length(
+  path: String,
+  value: String,
+  min min: Int,
+  max max: Int,
+) -> List(validation.ValidationError) {
+  let length = string.length(value)
+
+  case length >= min && length <= max {
+    True -> []
+    False -> [
+      error(path, validation.StringLengthOutOfRange(min:, max:, actual: length)),
+    ]
+  }
+}
+
+pub fn validate_string_max_length(
+  path: String,
+  value: String,
+  max max: Int,
+) -> List(validation.ValidationError) {
+  let length = string.length(value)
+
+  case length <= max {
+    True -> []
+    False -> [
+      error(path, validation.StringLengthExceeded(max:, actual: length)),
+    ]
+  }
+}
+
+pub fn validate_list_max_length(
+  path: String,
+  items: List(a),
+  max max: Int,
+  noun noun: String,
+) -> List(validation.ValidationError) {
+  let count = list.length(items)
+
+  case count <= max {
+    True -> []
+    False -> [
+      error(
+        path,
+        validation.ListLengthExceeded(max:, actual: count, item_label: noun),
+      ),
+    ]
+  }
+}
+
+pub fn validate_allowed_mentions(
+  path: String,
+  mentions: allowed_mentions.AllowedMentions,
+) -> List(validation.ValidationError) {
+  list.flatten([
+    case mentions.roles {
+      Some(roles) ->
+        validate_list_max_length(
+          join_path(path, "roles"),
+          roles,
+          max: 100,
+          noun: "role ids",
+        )
+
+      None -> []
+    },
+    case mentions.users {
+      Some(users) ->
+        validate_list_max_length(
+          join_path(path, "users"),
+          users,
+          max: 100,
+          noun: "user ids",
+        )
+
+      None -> []
+    },
+  ])
+}
+
+pub fn validate_attachments(
+  path: String,
+  attachments: List(attachment.Attachment),
+) -> List(validation.ValidationError) {
+  list.flatten([
+    attachments
+      |> list.index_map(fn(attachment, index) {
+        case attachment.description {
+          Some(description) ->
+            validate_string_length(
+              join_path(indexed_path(path, index), "description"),
+              description,
+              min: 1,
+              max: 1024,
+            )
+
+          None -> []
+        }
+      })
+      |> list.flatten,
+    duplicate_attachment_filename_errors(path, attachments),
+  ])
+}
+
+pub fn validate_embeds(
+  path: String,
+  embeds: List(embed.Embed),
+  attachment_filenames attachment_filenames: Option(List(String)),
+) -> List(validation.ValidationError) {
+  let total_character_count =
+    embeds
+    |> list.map(embed_character_count)
+    |> list.fold(0, fn(total, count) { total + count })
+
+  list.flatten([
+    validate_list_max_length(path, embeds, max: 10, noun: "embeds"),
+    case total_character_count <= 6000 {
+      True -> []
+      False -> [
+        error(
+          path,
+          validation.AggregateCharacterLimitExceeded(
+            limit_label: "embed_total_characters",
+            max: 6000,
+            actual: total_character_count,
+          ),
+        ),
+      ]
+    },
+    embeds
+      |> list.index_map(fn(embed, index) {
+        validate_embed(
+          indexed_path(path, index),
+          embed,
+          attachment_filenames: attachment_filenames,
+        )
+      })
+      |> list.flatten,
+  ])
+}
+
+pub fn validate_poll(
+  path: String,
+  poll: poll.Poll,
+) -> List(validation.ValidationError) {
+  // 768 hours
+  let max_poll_duration_hours = 24 * 32
+  list.flatten([
+    validate_string_length(
+      join_path(path, "question.text"),
+      poll.question.text,
+      min: 1,
+      max: 300,
+    ),
+    validate_list_max_length(
+      join_path(path, "answers"),
+      poll.answers,
+      max: 10,
+      noun: "answers",
+    ),
+    case poll.duration {
+      Some(duration) ->
+        case duration > max_poll_duration_hours {
+          True -> [
+            error(
+              join_path(path, "duration"),
+              validation.NumericMaximumExceeded(
+                max: max_poll_duration_hours,
+                actual: duration,
+                unit: "hours",
+              ),
+            ),
+          ]
+
+          False -> []
+        }
+      _ -> []
+    },
+    poll.answers
+      |> list.index_map(fn(answer, index) {
+        validate_poll_answer(
+          indexed_path(join_path(path, "answers"), index),
+          answer,
+        )
+      })
+      |> list.flatten,
+  ])
+}
+
+fn validate_embed(
+  path: String,
+  embed: embed.Embed,
+  attachment_filenames attachment_filenames: Option(List(String)),
+) -> List(validation.ValidationError) {
+  list.flatten([
+    case embed.title {
+      Some(title) ->
+        validate_string_max_length(join_path(path, "title"), title, max: 256)
+      None -> []
+    },
+    case embed.description {
+      Some(description) ->
+        validate_string_max_length(
+          join_path(path, "description"),
+          description,
+          max: 4096,
+        )
+
+      None -> []
+    },
+    case embed.footer {
+      Some(footer) ->
+        list.flatten([
+          validate_string_length(
+            join_path(path, "footer.text"),
+            footer.text,
+            min: 1,
+            max: 2048,
+          ),
+          case footer.icon_url {
+            Some(icon_url) ->
+              validate_attachment_reference(
+                join_path(path, "footer.icon_url"),
+                icon_url,
+                attachment_filenames: attachment_filenames,
+              )
+
+            None -> []
+          },
+        ])
+
+      None -> []
+    },
+    case embed.image {
+      Some(image) ->
+        validate_attachment_reference(
+          join_path(path, "image.url"),
+          image.url,
+          attachment_filenames: attachment_filenames,
+        )
+
+      None -> []
+    },
+    case embed.thumbnail {
+      Some(thumbnail) ->
+        validate_attachment_reference(
+          join_path(path, "thumbnail.url"),
+          thumbnail.url,
+          attachment_filenames: attachment_filenames,
+        )
+
+      None -> []
+    },
+    case embed.author {
+      Some(author) ->
+        list.flatten([
+          validate_string_length(
+            join_path(path, "author.name"),
+            author.name,
+            min: 1,
+            max: 256,
+          ),
+          case author.icon_url {
+            Some(icon_url) ->
+              validate_attachment_reference(
+                join_path(path, "author.icon_url"),
+                icon_url,
+                attachment_filenames: attachment_filenames,
+              )
+
+            None -> []
+          },
+        ])
+
+      None -> []
+    },
+    case embed.fields {
+      Some(fields) ->
+        list.flatten([
+          validate_list_max_length(
+            join_path(path, "fields"),
+            fields,
+            max: 25,
+            noun: "fields",
+          ),
+          fields
+            |> list.index_map(fn(field, index) {
+              list.flatten([
+                validate_string_length(
+                  join_path(
+                    indexed_path(join_path(path, "fields"), index),
+                    "name",
+                  ),
+                  field.name,
+                  min: 1,
+                  max: 256,
+                ),
+                validate_string_length(
+                  join_path(
+                    indexed_path(join_path(path, "fields"), index),
+                    "value",
+                  ),
+                  field.value,
+                  min: 1,
+                  max: 1024,
+                ),
+              ])
+            })
+            |> list.flatten,
+        ])
+
+      None -> []
+    },
+  ])
+}
+
+fn validate_poll_answer(
+  path: String,
+  answer: poll.PollAnswer,
+) -> List(validation.ValidationError) {
+  case answer.poll_media.text {
+    Some(text) ->
+      validate_string_length(
+        join_path(path, "poll_media.text"),
+        text,
+        min: 1,
+        max: 55,
+      )
+
+    None -> []
+  }
+}
+
+fn validate_attachment_reference(
+  path: String,
+  url: String,
+  attachment_filenames attachment_filenames: Option(List(String)),
+) -> List(validation.ValidationError) {
+  case attachment_reference_filename(url), attachment_filenames {
+    Some(filename), Some(attachment_filenames) ->
+      case filename == "" {
+        True -> [error(path, validation.AttachmentReferenceMissingFilename)]
+
+        False ->
+          case contains_string(in: attachment_filenames, target: filename) {
+            True -> []
+            False -> [
+              error(path, validation.MissingAttachmentReference(filename)),
+            ]
+          }
+      }
+
+    _, _ -> []
+  }
+}
+
+/// ## Examples
+///
+/// ```gleam
+/// assert attachment_reference_filename("attachment://landscape.jpg") == Some("landscape.jpg")
+/// ```
+///
+/// ```gleam
+/// assert attachment_reference_filename("an_invalid_filename") == None
+/// ```
+fn attachment_reference_filename(url: String) -> Option(String) {
+  let prefix = "attachment://"
+
+  case string.starts_with(url, prefix) {
+    True ->
+      Some(string.slice(
+        from: url,
+        at_index: string.length(prefix),
+        length: string.length(url) - string.length(prefix),
+      ))
+
+    False -> None
+  }
+}
+
+fn embed_character_count(embed: embed.Embed) -> Int {
+  optional_string_length(embed.title)
+  + optional_string_length(embed.description)
+  + optional_footer_text_length(embed.footer)
+  + optional_author_name_length(embed.author)
+  + optional_field_character_count(embed.fields)
+}
+
+fn optional_string_length(value: Option(String)) -> Int {
+  case value {
+    Some(value) -> string.length(value)
+    None -> 0
+  }
+}
+
+fn optional_footer_text_length(value: Option(embed.EmbedFooter)) -> Int {
+  case value {
+    Some(footer) -> string.length(footer.text)
+    None -> 0
+  }
+}
+
+fn optional_author_name_length(value: Option(embed.EmbedAuthor)) -> Int {
+  case value {
+    Some(author) -> string.length(author.name)
+    None -> 0
+  }
+}
+
+fn optional_field_character_count(value: Option(List(embed.EmbedField))) -> Int {
+  case value {
+    Some(fields) ->
+      fields
+      |> list.map(fn(field) {
+        string.length(field.name) + string.length(field.value)
+      })
+      |> list.fold(0, fn(total, count) { total + count })
+
+    None -> 0
+  }
+}
+
+fn contains_string(in items: List(String), target target: String) -> Bool {
+  case items {
+    [] -> False
+    [item, ..rest] -> item == target || contains_string(in: rest, target:)
+  }
+}
+
+fn duplicate_attachment_filename_errors(
+  path: String,
+  attachments: List(attachment.Attachment),
+) -> List(validation.ValidationError) {
+  attachments
+  |> list.index_map(fn(attachment, index) { #(attachment.filename, index) })
+  |> collect_duplicate_attachment_filename_errors(path, seen_filenames: [])
+}
+
+fn collect_duplicate_attachment_filename_errors(
+  indexed_filenames: List(#(String, Int)),
+  path: String,
+  seen_filenames seen_filenames: List(String),
+) -> List(validation.ValidationError) {
+  case indexed_filenames {
+    [] -> []
+    [#(filename, index), ..rest] ->
+      case contains_string(in: seen_filenames, target: filename) {
+        True ->
+          collect_duplicate_attachment_filename_errors(
+            rest,
+            path,
+            seen_filenames: seen_filenames,
+          )
+
+        False -> {
+          let indexes = [
+            index,
+            ..collect_attachment_filename_indexes(rest, filename)
+          ]
+
+          let duplicates = case list.length(indexes) > 1 {
+            True -> [
+              error(
+                path,
+                validation.DuplicateAttachmentFilename(filename:, indexes:),
+              ),
+            ]
+
+            False -> []
+          }
+
+          list.append(
+            duplicates,
+            collect_duplicate_attachment_filename_errors(
+              rest,
+              path,
+              seen_filenames: [filename, ..seen_filenames],
+            ),
+          )
+        }
+      }
+  }
+}
+
+fn collect_attachment_filename_indexes(
+  indexed_filenames: List(#(String, Int)),
+  filename: String,
+) -> List(Int) {
+  indexed_filenames
+  |> list.filter_map(fn(indexed_filename) {
+    let #(candiate_filename, candiate_index) = indexed_filename
+    case candiate_filename == filename {
+      True -> Ok(candiate_index)
+      False -> Error(Nil)
+    }
+  })
+}
+
+fn join_path(base: String, suffix: String) -> String {
+  base <> "." <> suffix
+}
+
+fn indexed_path(base: String, index: Int) -> String {
+  string.concat([base, "[", int.to_string(index), "]"])
+}
+
+fn error(
+  path: String,
+  reason: validation.ValidationReason,
+) -> validation.ValidationError {
+  validation.ValidationError(path:, reason:)
+}
