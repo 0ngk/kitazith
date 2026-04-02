@@ -120,22 +120,27 @@ pub fn build_payload_with_thumbnail() -> execute.ExecutePayload {
 
 When `execute webhook` is called with `wait=true`, Discord returns a message object.
 
-`kitazith/webhook/message` decodes the minimal subset needed to read the created message IDs and supported flags.
+`kitazith/webhook/message` decodes the minimal subset needed to read the
+created message IDs, timestamps, and supported flags.
 
 ```gleam
 import gleam/option
 import kitazith/flag
 import kitazith/snowflake
+import kitazith/timestamp
 import kitazith/webhook/message
 
 pub fn parse_response() -> Nil {
   let body =
-    "{\"id\":\"123\",\"channel_id\":\"456\",\"webhook_id\":\"789\",\"flags\":4}"
+    "{\"id\":\"123\",\"channel_id\":\"456\",\"timestamp\":\"2026-03-15T09:30:00Z\",\"edited_timestamp\":null,\"webhook_id\":\"789\",\"flags\":4}"
 
   let assert Ok(decoded) = message.decode(body)
+  let assert Ok(created_at) = timestamp.from_rfc3339("2026-03-15T09:30:00Z")
 
   assert decoded.id == snowflake.new("123")
   assert decoded.channel_id == snowflake.new("456")
+  assert decoded.timestamp == created_at
+  assert decoded.edited_timestamp == option.None
   assert decoded.webhook_id == option.Some(snowflake.new("789"))
   assert decoded.flags == option.Some([flag.SuppressEmbeds])
 }
