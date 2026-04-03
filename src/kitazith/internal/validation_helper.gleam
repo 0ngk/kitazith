@@ -9,6 +9,27 @@ import kitazith/embed
 import kitazith/poll
 import kitazith/validation
 
+pub fn validate_with_query(
+  payload: a,
+  query: b,
+  validate: fn(a) -> Result(a, List(validation.ValidationError)),
+  validate_query: fn(b, a) -> List(validation.ValidationError),
+) -> Result(a, List(validation.ValidationError)) {
+  let errors =
+    list.flatten([
+      case validate(payload) {
+        Ok(_) -> []
+        Error(errors) -> errors
+      },
+      validate_query(query, payload),
+    ])
+
+  case errors {
+    [] -> Ok(payload)
+    _ -> Error(errors)
+  }
+}
+
 pub fn attachment_filenames(
   attachments: List(attachment.Attachment),
 ) -> List(String) {

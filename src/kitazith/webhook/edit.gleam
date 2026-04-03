@@ -11,6 +11,7 @@ import kitazith/flag
 import kitazith/internal/json_helper
 import kitazith/internal/validation_helper
 import kitazith/validation
+import kitazith/webhook/edit_query
 
 /// Represents the three possible states of a field in an edit request:
 /// omit it, set it to a new value, or clear its current value.
@@ -192,6 +193,18 @@ pub fn validate(
   }
 }
 
+pub fn validate_with_query(
+  payload: EditPayload,
+  query: edit_query.EditQuery,
+) -> Result(EditPayload, List(validation.ValidationError)) {
+  validation_helper.validate_with_query(
+    payload,
+    query,
+    validate,
+    validate_query,
+  )
+}
+
 pub fn to_json(payload: EditPayload) -> json.Json {
   json_helper.object_omit_none([
     field("content", payload.content, json.string),
@@ -249,4 +262,16 @@ fn edit_payload_flag_to_message_flag(
     SuppressEmbeds -> flag.SuppressEmbeds
     IsComponentsV2 -> flag.IsComponentsV2
   }
+}
+
+fn validate_query(
+  _query: edit_query.EditQuery,
+  with _payload: EditPayload,
+) -> List(validation.ValidationError) {
+  // The result is always empty as no validation is needed
+  //   for Query String Params for the Edit Webhook Message endpoint.
+  //
+  // Learn more:
+  //   [Webhook Resource - Documentation - Discord > Edit Webhook Message](https://docs.discord.com/developers/resources/webhook#edit-webhook-message)
+  []
 }

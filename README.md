@@ -102,6 +102,11 @@ references, or duplicate attachment filenames.
 Each error includes a `reason` for programmatic matching, and
 `kitazith/validation.message` can be used to render a human-readable message.
 
+If you are sending query string params such as `wait`, `thread_id`, or `with_components`,
+use `kitazith/webhook/execute_query` and `kitazith/webhook/edit_query`.
+`execute.validate_with_query` also catches the Discord constraint that
+`thread_id` and `thread_name` must **NOT** be used together.
+
 ## Using Attachments Within Embeds
 
 Discord embeds can reference files uploaded in the same payload with the
@@ -128,7 +133,26 @@ pub fn build_payload_with_thumbnail() -> execute.ExecutePayload {
 
 ## Decoding Execute Webhook Responses
 
-When `execute webhook` is called with `wait=true`, Discord returns a message object.
+When `execute webhook` is called with `wait=true`, Discord returns a message
+object.
+
+```gleam
+import gleam/http/request
+import kitazith/webhook/execute_query
+
+
+pub fn main() {
+  let query =
+    execute_query.new_execute_query()
+    |> execute_query.with_wait(True)
+
+  let assert Ok(base_req) = request.to("YOUR_WEBHOOK_URL_HERE")
+
+  let req =
+    base_req
+    |> request.set_query(query |> execute_query.to_query)
+}
+```
 
 `kitazith/webhook/message` decodes the minimal subset needed to read the
 created message IDs, timestamps, supported flags, and response attachment

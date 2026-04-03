@@ -11,6 +11,7 @@ import kitazith/snowflake
 import kitazith/test_fixtures
 import kitazith/validation
 import kitazith/webhook/execute
+import kitazith/webhook/execute_query
 
 pub fn new_execute_payload_starts_empty_test() {
   let execute_payload = execute.new_execute_payload()
@@ -185,6 +186,37 @@ pub fn execute_payload_validate_success_test() {
     |> execute.with_poll(test_fixtures.sample_poll())
 
   assert execute.validate(payload) == Ok(payload)
+}
+
+pub fn execute_payload_validate_with_query_success_test() {
+  let payload =
+    execute.new_execute_payload()
+    |> execute.with_content("Hello")
+
+  let query =
+    execute_query.new_execute_query()
+    |> execute_query.with_wait(True)
+    |> execute_query.with_components(False)
+
+  assert execute.validate_with_query(payload, query) == Ok(payload)
+}
+
+pub fn execute_payload_validate_with_query_thread_conflict_test() {
+  let result =
+    execute.new_execute_payload()
+    |> execute.with_thread_name("release-notes")
+    |> execute.validate_with_query(
+      execute_query.new_execute_query()
+      |> execute_query.with_thread_id(snowflake.new("1234567890")),
+    )
+
+  assert result
+    == Error([
+      validation.ValidationError(
+        path: "query.thread_id",
+        reason: validation.MutuallyExclusiveWith("thread_name"),
+      ),
+    ])
 }
 
 pub fn execute_payload_validate_direct_constructor_error_test() {

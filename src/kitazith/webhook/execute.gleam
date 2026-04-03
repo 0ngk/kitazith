@@ -13,6 +13,7 @@ import kitazith/internal/validation_helper
 import kitazith/poll
 import kitazith/snowflake
 import kitazith/validation
+import kitazith/webhook/execute_query
 
 /// Learn more:
 ///   [Webhook Resource - Documentation - Discord > Execute Webhook > JSON/Form Params](https://docs.discord.com/developers/resources/webhook#execute-webhook-json/form-params)
@@ -224,6 +225,18 @@ pub fn validate(
   }
 }
 
+pub fn validate_with_query(
+  payload: ExecutePayload,
+  query: execute_query.ExecuteQuery,
+) -> Result(ExecutePayload, List(validation.ValidationError)) {
+  validation_helper.validate_with_query(
+    payload,
+    query,
+    validate,
+    validate_query,
+  )
+}
+
 pub fn to_json(payload: ExecutePayload) -> json.Json {
   json_helper.object_omit_none([
     json_helper.optional("content", payload.content, json.string),
@@ -277,5 +290,21 @@ fn execute_payload_flag_to_message_flag(
     SuppressEmbeds -> flag.SuppressEmbeds
     SuppressNotifications -> flag.SuppressNotifications
     IsComponentsV2 -> flag.IsComponentsV2
+  }
+}
+
+fn validate_query(
+  query: execute_query.ExecuteQuery,
+  with payload: ExecutePayload,
+) -> List(validation.ValidationError) {
+  case query.thread_id, payload.thread_name {
+    Some(_), Some(_) -> [
+      validation.ValidationError(
+        path: "query.thread_id",
+        reason: validation.MutuallyExclusiveWith("thread_name"),
+      ),
+    ]
+
+    _, _ -> []
   }
 }

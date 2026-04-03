@@ -11,6 +11,7 @@ import kitazith/snowflake
 import kitazith/test_fixtures
 import kitazith/validation
 import kitazith/webhook/edit
+import kitazith/webhook/edit_query
 
 pub fn new_edit_payload_starts_empty_test() {
   let edit_payload = edit.new_edit_payload()
@@ -184,6 +185,19 @@ pub fn edit_payload_validate_success_test() {
     ])
 
   assert edit.validate(payload) == Ok(payload)
+}
+
+pub fn edit_payload_validate_with_query_success_test() {
+  let payload =
+    edit.new_edit_payload()
+    |> edit.with_content("Hello")
+
+  let query =
+    edit_query.new_edit_query()
+    |> edit_query.with_thread_id(snowflake.new("1234567890"))
+    |> edit_query.with_components(False)
+
+  assert edit.validate_with_query(payload, query) == Ok(payload)
 }
 
 pub fn edit_payload_validate_attachment_reference_after_clear_test() {

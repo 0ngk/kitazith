@@ -17,6 +17,7 @@ pub type ValidationReason {
   MissingAttachmentReference(filename: String)
   AttachmentReferenceMissingFilename
   DuplicateAttachmentFilename(filename: String, indexes: List(Int))
+  MutuallyExclusiveWith(other_path: String)
 }
 
 pub fn message(error: ValidationError) -> String {
@@ -60,5 +61,8 @@ pub fn message(error: ValidationError) -> String {
       <> filename
       <> "` at indexes "
       <> indexes |> list.map(int.to_string) |> string.join(", ")
+
+    MutuallyExclusiveWith(other_path) ->
+      "must not be used together with `" <> other_path <> "`"
   }
 }

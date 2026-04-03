@@ -21,4 +21,10 @@ pub fn validation_message_test() {
       reason: validation.AttachmentReferenceMissingFilename,
     ))
     == "must include a filename after `attachment://`"
+
+  assert validation.message(validation.ValidationError(
+      path: "query.thread_id",
+      reason: validation.MutuallyExclusiveWith("thread_name"),
+    ))
+    == "must not be used together with `thread_name`"
 }
