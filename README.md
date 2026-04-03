@@ -121,7 +121,12 @@ pub fn build_payload_with_thumbnail() -> execute.ExecutePayload {
 When `execute webhook` is called with `wait=true`, Discord returns a message object.
 
 `kitazith/webhook/message` decodes the minimal subset needed to read the
-created message IDs, timestamps, and supported flags.
+created message IDs, timestamps, supported flags, and response attachment
+metadata.
+
+Response attachments are exposed as `message.MessageAttachment`, which is
+separate from the request-side `kitazith/attachment.Attachment` type used by
+`webhook/execute` and `webhook/edit`.
 
 ```gleam
 import gleam/option
@@ -132,7 +137,7 @@ import kitazith/webhook/message
 
 pub fn parse_response() -> Nil {
   let body =
-    "{\"id\":\"123\",\"channel_id\":\"456\",\"timestamp\":\"2026-03-15T09:30:00Z\",\"edited_timestamp\":null,\"webhook_id\":\"789\",\"flags\":4}"
+    "{\"id\":\"123\",\"channel_id\":\"456\",\"timestamp\":\"2026-03-15T09:30:00Z\",\"edited_timestamp\":null,\"webhook_id\":\"789\",\"flags\":4,\"attachments\":[{\"id\":\"987\",\"filename\":\"thumb.png\",\"size\":512,\"url\":\"https://cdn.discordapp.com/attachments/thumb.png\",\"proxy_url\":\"https://media.discordapp.net/attachments/thumb.png\"}]}"
 
   let assert Ok(decoded) = message.decode(body)
   let assert Ok(created_at) = timestamp.from_rfc3339("2026-03-15T09:30:00Z")
@@ -143,6 +148,25 @@ pub fn parse_response() -> Nil {
   assert decoded.edited_timestamp == option.None
   assert decoded.webhook_id == option.Some(snowflake.new("789"))
   assert decoded.flags == option.Some([flag.SuppressEmbeds])
+  assert decoded.attachments
+    == [
+      message.MessageAttachment(
+        id: snowflake.new("987"),
+        filename: "thumb.png",
+        title: option.None,
+        description: option.None,
+        content_type: option.None,
+        size: 512,
+        url: "https://cdn.discordapp.com/attachments/thumb.png",
+        proxy_url: "https://media.discordapp.net/attachments/thumb.png",
+        height: option.None,
+        width: option.None,
+        ephemeral: option.None,
+        duration_secs: option.None,
+        waveform: option.None,
+        flags: option.None,
+      ),
+    ]
 }
 ```
 
