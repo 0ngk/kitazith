@@ -5,7 +5,7 @@
 
 ## Description
 
-kitazith is a Gleam library for building Discord webhook payloads safely.
+kitazith is a Gleam library for building Discord incoming webhook payloads safely.
 
 Further documentation can be found at <https://hexdocs.pm/kitazith>.
 
