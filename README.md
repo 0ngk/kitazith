@@ -15,9 +15,19 @@ Further documentation can be found at <https://hexdocs.pm/kitazith>.
 gleam add kitazith
 ```
 
+If you also want to send webhook requests as shown in the example below,
+add an HTTP client as well:
+
+```sh
+gleam add gleam_http gleam_httpc
+```
+
 ## Example
 
 See [`kitazith_example`](https://github.com/0ngk/kitazith/tree/main/examples/kitazith_example) for more.
+
+The payload construction and validation come from `kitazith`. The request
+sending in this example uses `gleam_http` and `gleam_httpc`.
 
 ```gleam
 import gleam/http
@@ -205,8 +215,11 @@ pub fn server_guide() -> String {
 
 ## Development
 
+For runnable webhook flows, use
+[`examples/kitazith_example`](https://github.com/0ngk/kitazith/tree/main/examples/kitazith_example).
+
 ```sh
-gleam run    # Run the project
+gleam check  # Type-check the library
 gleam test   # Run the tests
 gleam format # Format the source
 ```

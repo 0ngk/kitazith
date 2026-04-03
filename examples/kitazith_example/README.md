@@ -13,6 +13,9 @@ Sends a webhook message with the existing rich payload example:
 - embed
 - poll
 
+The payload is built in `src/kitazith_example/execute.gleam` and reused by the
+edit example.
+
 Run it with:
 
 ```sh
@@ -23,6 +26,8 @@ gleam run -m kitazith_example/execute
 
 Sends the same rich payload, waits for Discord to return the created message,
 extracts the message ID, and then edits that message.
+
+The initial execute payload is validated before the request is sent.
 
 Run it with:
 

@@ -12,7 +12,8 @@ import kitazith/webhook/message
 import kitazith_example/execute as execute_example
 
 pub fn main() {
-  let initial_payload = execute_example.build_payload()
+  let assert Ok(initial_payload) =
+    execute_example.build_payload() |> execute.validate
 
   let assert Ok(base_req) = request.to(execute_example.webhook_url())
   let initial_req =
