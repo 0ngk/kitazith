@@ -103,8 +103,8 @@ Each error includes a `reason` for programmatic matching, and
 `kitazith/validation.message` can be used to render a human-readable message.
 
 If you are sending query string params such as `wait`, `thread_id`, or `with_components`,
-use `kitazith/webhook/execute_query`, `kitazith/webhook/edit_query`, and
-`kitazith/webhook/delete_query`.
+use `kitazith/webhook/execute_query`, `kitazith/webhook/edit_query`,
+`kitazith/webhook/delete_query`, and `kitazith/webhook/get_query`.
 `execute.validate_with_query` also catches the Discord constraint that
 `thread_id` and `thread_name` must **NOT** be used together.
 
@@ -202,6 +202,42 @@ pub fn parse_response() -> Nil {
         flags: option.None,
       ),
     ]
+}
+```
+
+## Building Get Webhook Message Queries
+
+`Get Webhook Message` does not use a request body. If the target message is in
+a thread, include `thread_id` in the query string and decode the response with
+`kitazith/webhook/message`.
+
+```gleam
+import gleam/http/request
+import gleam/httpc
+import gleam/result
+
+import kitazith/snowflake
+import kitazith/webhook/get_query
+import kitazith/webhook/message
+
+pub fn get_message(webhook_url: String, message_id: String) {
+  let query =
+    get_query.new()
+    |> get_query.with_thread_id(snowflake.new("1234567890"))
+
+  let assert Ok(base_req) =
+    request.to(webhook_url <> "/messages/" <> message_id)
+
+  let req =
+    base_req
+    |> request.set_query(query |> get_query.to_query)
+
+  use resp <- result.try(httpc.send(req))
+  assert resp.status == 200
+
+  let assert Ok(webhook_message) = message.decode(resp.body)
+  echo webhook_message.id
+  Ok(webhook_message)
 }
 ```
 
