@@ -3,8 +3,8 @@ import gleam/option.{None, Some}
 import kitazith/snowflake
 import kitazith/webhook/edit_query
 
-pub fn new_edit_query_starts_empty_test() {
-  let query = edit_query.new_edit_query()
+pub fn new_starts_empty_test() {
+  let query = edit_query.new()
 
   assert query.thread_id == None
   assert query.with_components == None
@@ -12,7 +12,7 @@ pub fn new_edit_query_starts_empty_test() {
 
 pub fn builder_edit_query_test() {
   let query =
-    edit_query.new_edit_query()
+    edit_query.new()
     |> edit_query.with_thread_id(snowflake.new("1234567890"))
     |> edit_query.with_components(False)
 
@@ -21,14 +21,14 @@ pub fn builder_edit_query_test() {
 }
 
 pub fn edit_query_empty_to_query_test() {
-  let result = edit_query.new_edit_query() |> edit_query.to_query
+  let result = edit_query.new() |> edit_query.to_query
 
   assert result == []
 }
 
 pub fn edit_query_false_values_preserved_test() {
   let result =
-    edit_query.new_edit_query()
+    edit_query.new()
     |> edit_query.with_components(False)
     |> edit_query.to_query
 
@@ -37,7 +37,7 @@ pub fn edit_query_false_values_preserved_test() {
 
 pub fn edit_query_full_to_query_test() {
   let result =
-    edit_query.new_edit_query()
+    edit_query.new()
     |> edit_query.with_thread_id(snowflake.new("1234567890"))
     |> edit_query.with_components(True)
     |> edit_query.to_query

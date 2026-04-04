@@ -60,7 +60,7 @@ pub type PollEmoji {
   )
 }
 
-pub fn new_poll(
+pub fn new(
   question question: PollQuestion,
   answers answers: List(PollAnswer),
 ) -> Poll {

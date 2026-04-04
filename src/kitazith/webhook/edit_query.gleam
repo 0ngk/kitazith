@@ -12,7 +12,7 @@ pub type EditQuery {
   )
 }
 
-pub fn new_edit_query() -> EditQuery {
+pub fn new() -> EditQuery {
   EditQuery(thread_id: None, with_components: None)
 }
 

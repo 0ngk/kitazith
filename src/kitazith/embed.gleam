@@ -82,7 +82,7 @@ pub type EmbedField {
   )
 }
 
-pub fn new_embed() -> Embed {
+pub fn new() -> Embed {
   Embed(
     title: None,
     description: None,
@@ -127,7 +127,7 @@ pub fn with_color(embed: Embed, color: Int) -> Embed {
 /// ```
 ///
 /// ```gleam
-/// embed.new_embed()
+/// embed.new()
 /// |> embed.with_color(embed.color_from_rgb(red: 88, green: 101, blue: 242))
 /// ```
 pub fn color_from_rgb(red red: Int, green green: Int, blue blue: Int) -> Int {

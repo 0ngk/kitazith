@@ -12,7 +12,7 @@ pub type Attachment {
   )
 }
 
-pub fn new_attachment(id id: Int, filename filename: String) -> Attachment {
+pub fn new(id id: Int, filename filename: String) -> Attachment {
   Attachment(id:, filename:, description: None)
 }
 

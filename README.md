@@ -58,11 +58,11 @@ pub fn webhook_url() -> String {
 }
 
 pub fn build_payload() -> execute.ExecutePayload {
-  execute.new_execute_payload()
+  execute.new()
   |> execute.with_username("A bot")
   |> execute.with_content("Hello from Gleam!")
   |> execute.with_embeds([
-    embed.new_embed()
+    embed.new()
     |> embed.with_title("Release Status")
     |> embed.with_description("The build is green and ready to ship.")
     |> embed.with_color(embed.color_from_rgb(red: 87, green: 242, blue: 135))
@@ -72,7 +72,7 @@ pub fn build_payload() -> execute.ExecutePayload {
     ]),
   ])
   |> execute.with_poll(
-    poll.new_poll(question: poll.PollQuestion(text: "Ship it?"), answers: [
+    poll.new(question: poll.PollQuestion(text: "Ship it?"), answers: [
       poll.PollAnswer(
         poll_media: poll.new_poll_media()
         |> poll.with_poll_media_emoji(
@@ -118,12 +118,12 @@ import kitazith/embed
 import kitazith/webhook/execute
 
 pub fn build_payload_with_thumbnail() -> execute.ExecutePayload {
-  let thumbnail = attachment.new_attachment(id: 0, filename: "thumb.png")
+  let thumbnail = attachment.new(id: 0, filename: "thumb.png")
 
-  execute.new_execute_payload()
+  execute.new()
   |> execute.with_attachments([thumbnail])
   |> execute.with_embeds([
-    embed.new_embed()
+    embed.new()
     |> embed.with_thumbnail(
       embed.EmbedThumbnail(url: attachment.to_embed_url(thumbnail)),
     ),
@@ -143,7 +143,7 @@ import kitazith/webhook/execute_query
 
 pub fn main() {
   let query =
-    execute_query.new_execute_query()
+    execute_query.new()
     |> execute_query.with_wait(True)
 
   let assert Ok(base_req) = request.to("YOUR_WEBHOOK_URL_HERE")

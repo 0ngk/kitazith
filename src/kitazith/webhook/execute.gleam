@@ -54,7 +54,7 @@ pub type ExecutePayloadFlag {
   IsComponentsV2
 }
 
-pub fn new_execute_payload() -> ExecutePayload {
+pub fn new() -> ExecutePayload {
   ExecutePayload(
     content: None,
     username: None,

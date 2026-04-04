@@ -13,7 +13,7 @@ pub type ExecuteQuery {
   )
 }
 
-pub fn new_execute_query() -> ExecuteQuery {
+pub fn new() -> ExecuteQuery {
   ExecuteQuery(wait: None, thread_id: None, with_components: None)
 }
 

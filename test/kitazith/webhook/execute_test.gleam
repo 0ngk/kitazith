@@ -13,8 +13,8 @@ import kitazith/validation
 import kitazith/webhook/execute
 import kitazith/webhook/execute_query
 
-pub fn new_execute_payload_starts_empty_test() {
-  let execute_payload = execute.new_execute_payload()
+pub fn new_starts_empty_test() {
+  let execute_payload = execute.new()
 
   assert execute_payload.content == None
   assert execute_payload.username == None
@@ -80,7 +80,7 @@ pub fn execute_payload_supports_all_submodules_test() {
 
 pub fn builder_execute_payload_test() {
   let execute_payload =
-    execute.new_execute_payload()
+    execute.new()
     |> execute.with_content("Hello")
     |> execute.with_username("kitazith")
     |> execute.with_avatar_url("https://example.com/avatar.png")
@@ -111,13 +111,13 @@ pub fn builder_execute_payload_test() {
 }
 
 pub fn execute_payload_empty_to_json_test() {
-  let result = execute.new_execute_payload() |> execute.to_string
+  let result = execute.new() |> execute.to_string
   assert result == "{}"
 }
 
 pub fn execute_payload_none_fields_omitted_test() {
   let result =
-    execute.new_execute_payload()
+    execute.new()
     |> execute.with_content("Hello")
     |> execute.to_string
 
@@ -126,7 +126,7 @@ pub fn execute_payload_none_fields_omitted_test() {
 
 pub fn execute_payload_falsy_values_preserved_test() {
   let result =
-    execute.new_execute_payload()
+    execute.new()
     |> execute.with_tts(False)
     |> execute.with_flags([])
     |> execute.with_embeds([])
@@ -137,23 +137,23 @@ pub fn execute_payload_falsy_values_preserved_test() {
 
 pub fn execute_payload_full_to_json_test() {
   let result =
-    execute.new_execute_payload()
+    execute.new()
     |> execute.with_content("Hello")
     |> execute.with_username("kitazith")
     |> execute.with_tts(False)
     |> execute.with_embeds([
-      embed.new_embed()
+      embed.new()
       |> embed.with_title("Release"),
     ])
     |> execute.with_allowed_mentions(
-      allowed_mentions.new_allowed_mentions()
+      allowed_mentions.new()
       |> allowed_mentions.with_parse([allowed_mentions.Users]),
     )
     |> execute.with_components([
       component.raw(json.object([#("type", json.int(1))])),
     ])
     |> execute.with_attachments([
-      attachment.new_attachment(id: 0, filename: "banner.png"),
+      attachment.new(id: 0, filename: "banner.png"),
     ])
     |> execute.with_flags([])
     |> execute.with_thread_name("release-notes")
@@ -166,14 +166,14 @@ pub fn execute_payload_full_to_json_test() {
 
 pub fn execute_payload_validate_success_test() {
   let payload =
-    execute.new_execute_payload()
+    execute.new()
     |> execute.with_content("Hello")
     |> execute.with_username("kitazith")
     |> execute.with_embeds([
-      embed.new_embed()
+      embed.new()
       |> embed.with_thumbnail(
         embed.EmbedThumbnail(
-          url: attachment.to_embed_url(attachment.new_attachment(
+          url: attachment.to_embed_url(attachment.new(
             id: 0,
             filename: "thumb.png",
           )),
@@ -181,7 +181,7 @@ pub fn execute_payload_validate_success_test() {
       ),
     ])
     |> execute.with_attachments([
-      attachment.new_attachment(id: 0, filename: "thumb.png"),
+      attachment.new(id: 0, filename: "thumb.png"),
     ])
     |> execute.with_poll(test_fixtures.sample_poll())
 
@@ -190,11 +190,11 @@ pub fn execute_payload_validate_success_test() {
 
 pub fn execute_payload_validate_with_query_success_test() {
   let payload =
-    execute.new_execute_payload()
+    execute.new()
     |> execute.with_content("Hello")
 
   let query =
-    execute_query.new_execute_query()
+    execute_query.new()
     |> execute_query.with_wait(True)
     |> execute_query.with_components(False)
 
@@ -203,10 +203,10 @@ pub fn execute_payload_validate_with_query_success_test() {
 
 pub fn execute_payload_validate_with_query_thread_conflict_test() {
   let result =
-    execute.new_execute_payload()
+    execute.new()
     |> execute.with_thread_name("release-notes")
     |> execute.validate_with_query(
-      execute_query.new_execute_query()
+      execute_query.new()
       |> execute_query.with_thread_id(snowflake.new("1234567890")),
     )
 
@@ -248,9 +248,9 @@ pub fn execute_payload_validate_direct_constructor_error_test() {
 
 pub fn execute_payload_validate_attachment_reference_error_test() {
   let result =
-    execute.new_execute_payload()
+    execute.new()
     |> execute.with_embeds([
-      embed.new_embed()
+      embed.new()
       |> embed.with_thumbnail(embed.EmbedThumbnail(
         url: "attachment://thumb.png",
       )),
@@ -268,11 +268,11 @@ pub fn execute_payload_validate_attachment_reference_error_test() {
 
 pub fn execute_payload_validate_embed_total_character_limit_test() {
   let result =
-    execute.new_execute_payload()
+    execute.new()
     |> execute.with_embeds([
-      embed.new_embed()
+      embed.new()
         |> embed.with_description(string.repeat("a", times: 4000)),
-      embed.new_embed()
+      embed.new()
         |> embed.with_description(string.repeat("b", times: 2001)),
     ])
     |> execute.validate
@@ -292,7 +292,7 @@ pub fn execute_payload_validate_embed_total_character_limit_test() {
 
 pub fn execute_payload_validate_poll_constraints_test() {
   let result =
-    execute.new_execute_payload()
+    execute.new()
     |> execute.with_poll(poll.Poll(
       question: poll.PollQuestion(text: ""),
       answers: [
@@ -326,10 +326,10 @@ pub fn execute_payload_validate_poll_constraints_test() {
 
 pub fn execute_payload_validate_duplicate_attachment_filename_test() {
   let result =
-    execute.new_execute_payload()
+    execute.new()
     |> execute.with_attachments([
-      attachment.new_attachment(id: 0, filename: "thumb.png"),
-      attachment.new_attachment(id: 1, filename: "thumb.png"),
+      attachment.new(id: 0, filename: "thumb.png"),
+      attachment.new(id: 1, filename: "thumb.png"),
     ])
     |> execute.validate
 

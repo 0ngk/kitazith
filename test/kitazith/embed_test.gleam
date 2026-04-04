@@ -16,7 +16,7 @@ pub fn color_from_rgb_test() {
 
 pub fn builder_embed_test() {
   let e =
-    embed.new_embed()
+    embed.new()
     |> embed.with_title("Release")
     |> embed.with_description("The build is ready.")
     |> embed.with_url("https://example.com")
@@ -63,7 +63,7 @@ pub fn builder_embed_test() {
 
 pub fn embed_to_json_test() {
   let result =
-    embed.new_embed()
+    embed.new()
     |> embed.with_title("Release")
     |> embed.with_description("The build is ready.")
     |> embed.with_timestamp(test_fixtures.sample_timestamp())
@@ -90,10 +90,10 @@ pub fn embed_to_json_test() {
 
 pub fn embed_to_json_with_attachment_thumbnail_test() {
   let result =
-    embed.new_embed()
+    embed.new()
     |> embed.with_thumbnail(
       embed.EmbedThumbnail(
-        url: attachment.to_embed_url(attachment.new_attachment(
+        url: attachment.to_embed_url(attachment.new(
           id: 0,
           filename: "thumb.png",
         )),

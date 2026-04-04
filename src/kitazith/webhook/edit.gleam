@@ -59,7 +59,7 @@ pub type EditPayloadFlag {
   IsComponentsV2
 }
 
-pub fn new_edit_payload() -> EditPayload {
+pub fn new() -> EditPayload {
   EditPayload(
     content: Omit,
     embeds: Omit,

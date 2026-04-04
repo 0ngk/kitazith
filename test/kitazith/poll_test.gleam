@@ -5,7 +5,7 @@ import kitazith/poll
 
 pub fn builder_poll_test() {
   let p =
-    poll.new_poll(question: poll.PollQuestion(text: "Pick one"), answers: [
+    poll.new(question: poll.PollQuestion(text: "Pick one"), answers: [
       poll.PollAnswer(
         poll_media: poll.new_poll_media()
         |> poll.with_poll_media_text("Option A"),
@@ -30,7 +30,7 @@ pub fn builder_poll_test() {
 
 pub fn poll_to_json_test() {
   let result =
-    poll.new_poll(question: poll.PollQuestion(text: "Pick one"), answers: [
+    poll.new(question: poll.PollQuestion(text: "Pick one"), answers: [
       poll.PollAnswer(
         poll_media: poll.new_poll_media()
         |> poll.with_poll_media_text("Option A"),

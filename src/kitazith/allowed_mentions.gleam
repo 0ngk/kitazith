@@ -25,7 +25,7 @@ pub type AllowedMention {
   Everyone
 }
 
-pub fn new_allowed_mentions() -> AllowedMentions {
+pub fn new() -> AllowedMentions {
   AllowedMentions(parse: None, roles: None, users: None, replied_user: None)
 }
 

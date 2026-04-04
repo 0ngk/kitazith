@@ -6,7 +6,7 @@ import kitazith/snowflake
 
 pub fn builder_allowed_mentions_test() {
   let m =
-    allowed_mentions.new_allowed_mentions()
+    allowed_mentions.new()
     |> allowed_mentions.with_parse([allowed_mentions.Users])
     |> allowed_mentions.with_users([snowflake.new("42")])
     |> allowed_mentions.with_replied_user(False)
@@ -19,7 +19,7 @@ pub fn builder_allowed_mentions_test() {
 
 pub fn allowed_mentions_to_json_test() {
   let result =
-    allowed_mentions.new_allowed_mentions()
+    allowed_mentions.new()
     |> allowed_mentions.with_parse([
       allowed_mentions.Roles,
       allowed_mentions.Users,
