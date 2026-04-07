@@ -10,6 +10,7 @@ import kitazith/component/file as component_file
 import kitazith/component/media
 import kitazith/component/media_gallery
 import kitazith/component/section
+import kitazith/component/separator
 import kitazith/component/text_display
 import kitazith/embed
 import kitazith/poll
@@ -359,6 +360,7 @@ pub fn execute_payload_v2_components_to_json_test() {
       component.section(test_fixtures.sample_section()),
       component.media_gallery(test_fixtures.sample_media_gallery()),
       component.file(test_fixtures.sample_file()),
+      component.separator(test_fixtures.sample_separator()),
     ])
     |> execute.with_attachments([
       attachment.new(id: 0, filename: "thumb.png"),
@@ -369,7 +371,7 @@ pub fn execute_payload_v2_components_to_json_test() {
     |> execute.to_string
 
   assert result
-    == "{\"components\":[{\"type\":10,\"content\":\"# Release\"},{\"type\":9,\"components\":[{\"type\":10,\"content\":\"# Release\"},{\"type\":10,\"content\":\"The build is ready.\"}],\"accessory\":{\"type\":11,\"media\":{\"url\":\"attachment://thumb.png\"}}},{\"type\":12,\"items\":[{\"media\":{\"url\":\"attachment://gallery.png\"},\"description\":\"Gallery preview\"}]},{\"type\":13,\"file\":{\"url\":\"attachment://release-notes.pdf\"}}],\"attachments\":[{\"id\":0,\"filename\":\"thumb.png\"},{\"id\":1,\"filename\":\"gallery.png\"},{\"id\":2,\"filename\":\"release-notes.pdf\"}],\"flags\":32768}"
+    == "{\"components\":[{\"type\":10,\"content\":\"# Release\"},{\"type\":9,\"components\":[{\"type\":10,\"content\":\"# Release\"},{\"type\":10,\"content\":\"The build is ready.\"}],\"accessory\":{\"type\":11,\"media\":{\"url\":\"attachment://thumb.png\"}}},{\"type\":12,\"items\":[{\"media\":{\"url\":\"attachment://gallery.png\"},\"description\":\"Gallery preview\"}]},{\"type\":13,\"file\":{\"url\":\"attachment://release-notes.pdf\"}},{\"type\":14,\"divider\":true,\"spacing\":1}],\"attachments\":[{\"id\":0,\"filename\":\"thumb.png\"},{\"id\":1,\"filename\":\"gallery.png\"},{\"id\":2,\"filename\":\"release-notes.pdf\"}],\"flags\":32768}"
 }
 
 pub fn execute_payload_validate_v2_components_success_test() {
@@ -452,6 +454,10 @@ pub fn execute_payload_validate_v2_component_constraints_test() {
       ),
       component.file(
         component_file.new(media.new("https://example.com/file.pdf")),
+      ),
+      component.separator(
+        separator.new()
+        |> separator.with_spacing(separator.Large),
       ),
     ])
     |> execute.with_attachments([

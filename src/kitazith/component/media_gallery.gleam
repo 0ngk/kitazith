@@ -9,7 +9,7 @@ import kitazith/internal/json_helper
 pub type MediaGallery {
   MediaGallery(
     id: Option(Int),
-    /// One to ten media gallery items.
+    /// 1 to 10 media gallery items.
     items: List(MediaGalleryItem),
   )
 }

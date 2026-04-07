@@ -3,6 +3,7 @@ import gleam/json
 import kitazith/component/file as component_file
 import kitazith/component/media_gallery as component_media_gallery
 import kitazith/component/section as component_section
+import kitazith/component/separator as component_separator
 import kitazith/component/text_display as component_text_display
 
 /// Learn more:
@@ -14,6 +15,7 @@ pub type Component {
   SectionComponent(component_section.Section)
   MediaGalleryComponent(component_media_gallery.MediaGallery)
   FileComponent(component_file.File)
+  SeparatorComponent(component_separator.Separator)
 }
 
 pub fn raw(data: json.Json) -> Component {
@@ -40,6 +42,10 @@ pub fn file(file: component_file.File) -> Component {
   FileComponent(file)
 }
 
+pub fn separator(separator: component_separator.Separator) -> Component {
+  SeparatorComponent(separator)
+}
+
 pub fn to_json(component: Component) -> json.Json {
   case component {
     Component(raw) -> raw
@@ -49,5 +55,6 @@ pub fn to_json(component: Component) -> json.Json {
     MediaGalleryComponent(media_gallery) ->
       component_media_gallery.to_json(media_gallery)
     FileComponent(file) -> component_file.to_json(file)
+    SeparatorComponent(separator) -> component_separator.to_json(separator)
   }
 }

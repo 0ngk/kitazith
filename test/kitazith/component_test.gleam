@@ -4,6 +4,7 @@ import kitazith/component
 import kitazith/component/file as component_file
 import kitazith/component/media_gallery
 import kitazith/component/section
+import kitazith/component/separator
 import kitazith/component/text_display
 import kitazith/test_fixtures
 
@@ -64,4 +65,26 @@ pub fn file_component_to_json_test() {
 
   assert result
     == "{\"type\":13,\"id\":10,\"file\":{\"url\":\"attachment://release-notes.pdf\"},\"spoiler\":true}"
+}
+
+pub fn separator_component_to_json_test() {
+  let result =
+    test_fixtures.sample_separator()
+    |> separator.with_id(11)
+    |> component.separator
+    |> component.to_json
+    |> json.to_string
+
+  assert result == "{\"type\":14,\"id\":11,\"divider\":true,\"spacing\":1}"
+}
+
+pub fn separator_large_spacing_component_to_json_test() {
+  let result =
+    separator.new()
+    |> separator.with_spacing(separator.Large)
+    |> component.separator
+    |> component.to_json
+    |> json.to_string
+
+  assert result == "{\"type\":14,\"spacing\":2}"
 }

@@ -442,6 +442,7 @@ fn validate_component(
       )
     component.FileComponent(file) ->
       validate_file(path, file, attachment_filenames: attachment_filenames)
+    component.SeparatorComponent(_) -> []
   }
 }
 
@@ -634,6 +635,7 @@ fn component_count(component: component.Component) -> Int {
       1 + list.length(section.components) + 1
     component.MediaGalleryComponent(_) -> 1
     component.FileComponent(_) -> 1
+    component.SeparatorComponent(_) -> 1
   }
 }
 
@@ -672,6 +674,7 @@ fn is_v2_component_type(component_type: Int) -> Bool {
     11 -> True
     12 -> True
     13 -> True
+    14 -> True
     _ -> False
   }
 }

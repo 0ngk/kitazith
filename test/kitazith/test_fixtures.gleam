@@ -8,6 +8,7 @@ import kitazith/component/file as component_file
 import kitazith/component/media
 import kitazith/component/media_gallery
 import kitazith/component/section
+import kitazith/component/separator
 import kitazith/component/text_display
 import kitazith/embed
 import kitazith/poll
@@ -53,6 +54,12 @@ pub fn sample_media_gallery() -> media_gallery.MediaGallery {
 
 pub fn sample_file() -> component_file.File {
   component_file.new(media.new("attachment://release-notes.pdf"))
+}
+
+pub fn sample_separator() -> separator.Separator {
+  separator.new()
+  |> separator.with_divider(True)
+  |> separator.with_spacing(separator.Small)
 }
 
 pub fn sample_embed() -> embed.Embed {
