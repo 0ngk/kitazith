@@ -3,7 +3,9 @@ import gleam/option.{None, Some}
 
 import kitazith/allowed_mentions
 import kitazith/attachment
+import kitazith/color
 import kitazith/component
+import kitazith/component/container
 import kitazith/component/file as component_file
 import kitazith/component/media
 import kitazith/component/media_gallery
@@ -60,6 +62,17 @@ pub fn sample_separator() -> separator.Separator {
   separator.new()
   |> separator.with_divider(True)
   |> separator.with_spacing(separator.Small)
+}
+
+pub fn sample_container() -> container.Container {
+  container.new([
+    container.text_display(text_display.new("# Release")),
+    container.section(sample_section()),
+    container.media_gallery(sample_media_gallery()),
+    container.file(sample_file()),
+    container.separator(sample_separator()),
+  ])
+  |> container.with_accent_color(color.from_rgb(red: 88, green: 98, blue: 10))
 }
 
 pub fn sample_embed() -> embed.Embed {

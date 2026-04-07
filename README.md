@@ -35,6 +35,7 @@ import gleam/http/request
 import gleam/httpc
 import gleam/result
 
+import kitazith/color
 import kitazith/embed
 import kitazith/poll
 import kitazith/webhook/execute
@@ -65,7 +66,7 @@ pub fn build_payload() -> execute.ExecutePayload {
     embed.new()
     |> embed.with_title("Release Status")
     |> embed.with_description("The build is green and ready to ship.")
-    |> embed.with_color(embed.color_from_rgb(red: 87, green: 242, blue: 135))
+    |> embed.with_color(color.from_rgb(red: 87, green: 242, blue: 135))
     |> embed.with_fields([
       embed.new_field(name: "Status", value: "🟢 Green")
       |> embed.with_field_inline(True),
@@ -107,6 +108,87 @@ use `kitazith/webhook/execute_query`, `kitazith/webhook/edit_query`,
 `kitazith/webhook/delete_query`, and `kitazith/webhook/get_query`.
 `execute.validate_with_query` also catches the Discord constraint that
 `thread_id` and `thread_name` must **NOT** be used together.
+
+## Non-Application-Owned Webhook Components
+
+Discord only respects webhook `components` when `with_components=true` is set
+in the query string. For non-application-owned webhooks, Discord only allows
+non-interactive Components V2.
+
+`kitazith/component/*` provides typed builders for:
+
+- `Text Display`
+- `Section` with a `Thumbnail` accessory
+- `Media Gallery`
+- `File`
+- `Separator`
+- `Container`
+
+When using these typed components:
+
+- set `execute_query.with_components(True)` or `edit_query.with_components(True)`
+- include the `execute.IsComponentsV2` or `edit.IsComponentsV2` flag
+- do not send `content`, `embeds`, or `poll` in the same payload
+
+```gleam
+import gleam/http
+import gleam/http/request
+
+import kitazith/color
+import kitazith/component
+import kitazith/component/container
+import kitazith/component/media
+import kitazith/component/section
+import kitazith/component/separator
+import kitazith/component/text_display
+import kitazith/webhook/execute
+import kitazith/webhook/execute_query
+
+pub fn build_query() -> execute_query.ExecuteQuery {
+  execute_query.new()
+  |> execute_query.with_components(True)
+}
+
+pub fn build_payload() -> execute.ExecutePayload {
+  let hero = section.new_thumbnail(media.new("https://example.com/release.webp"))
+
+  execute.new()
+  |> execute.with_components([
+    component.text_display(text_display.new("# Release Notes")),
+    component.section(section.new(
+      components: [
+        text_display.new("Version 7.3 is now live."),
+        text_display.new("Maintenance completed without downtime."),
+      ],
+      accessory: hero,
+    )),
+    component.separator(separator.new()),
+    component.container(
+      container.new([
+        container.text_display(text_display.new("Thanks for following the rollout.")),
+      ])
+      |> container.with_accent_color(
+        color.from_rgb(red: 88, green: 101, blue: 242),
+      ),
+    ),
+  ])
+  |> execute.with_flags([execute.IsComponentsV2])
+}
+
+pub fn build_request() {
+  let query = build_query()
+  let payload = build_payload()
+  let assert Ok(req) = request.to("YOUR_WEBHOOK_URL_HERE")
+
+  req
+  |> request.set_method(http.Post)
+  |> request.set_query(execute_query.to_query(query))
+  |> request.set_body(execute.to_string(payload))
+}
+```
+
+`component.raw` remains available as an escape hatch for unsupported or
+application-owned webhook component payloads.
 
 ## Using Attachments Within Embeds
 

@@ -2,17 +2,9 @@ import gleam/json
 import gleam/option.{Some}
 
 import kitazith/attachment
+import kitazith/color
 import kitazith/embed
 import kitazith/test_fixtures
-
-pub fn color_from_rgb_test() {
-  assert embed.color_from_rgb(red: 255, green: 0, blue: 0) == 0xFF0000
-  assert embed.color_from_rgb(red: 0, green: 255, blue: 0) == 0x00FF00
-  assert embed.color_from_rgb(red: 0, green: 0, blue: 255) == 0x0000FF
-  assert embed.color_from_rgb(red: 88, green: 101, blue: 242) == 5_793_266
-  assert embed.color_from_rgb(red: 0, green: 0, blue: 0) == 0
-  assert embed.color_from_rgb(red: 255, green: 255, blue: 255) == 0xFFFFFF
-}
 
 pub fn builder_embed_test() {
   let e =
@@ -67,7 +59,7 @@ pub fn embed_to_json_test() {
     |> embed.with_title("Release")
     |> embed.with_description("The build is ready.")
     |> embed.with_timestamp(test_fixtures.sample_timestamp())
-    |> embed.with_color(5_792_266)
+    |> embed.with_color(color.from_rgb(red: 88, green: 98, blue: 10))
     |> embed.with_footer(
       embed.new_footer("kitazith")
       |> embed.with_footer_icon_url("https://example.com/footer.png"),
