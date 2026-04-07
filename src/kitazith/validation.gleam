@@ -16,6 +16,7 @@ pub type ValidationReason {
   AggregateComponentLimitExceeded(max: Int, actual: Int)
   ComponentCountOutOfRange(min: Int, max: Int, actual: Int, item_label: String)
   NumericMaximumExceeded(max: Int, actual: Int, unit: String)
+  NumericOutOfRange(min: Int, max: Int, actual: Int, unit: String)
   MissingAttachmentReference(filename: String)
   AttachmentReferenceMissingFilename
   AttachmentReferenceRequired
@@ -62,6 +63,14 @@ pub fn message(error: ValidationError) -> String {
 
     NumericMaximumExceeded(max:, unit:, ..) ->
       "must be at most " <> int.to_string(max) <> " " <> unit
+
+    NumericOutOfRange(min:, max:, unit:, ..) ->
+      "must be between "
+      <> int.to_string(min)
+      <> " and "
+      <> int.to_string(max)
+      <> " "
+      <> unit
 
     MissingAttachmentReference(filename) ->
       "references attachment `"

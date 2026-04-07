@@ -592,15 +592,36 @@ fn validate_container(
   container: component_container.Container,
   attachment_filenames attachment_filenames: Option(List(String)),
 ) -> List(validation.ValidationError) {
-  container.components
-  |> list.index_map(fn(child, index) {
-    validate_container_child(
-      indexed_path(join_path(path, "components"), index),
-      child,
-      attachment_filenames: attachment_filenames,
-    )
-  })
-  |> list.flatten
+  list.flatten([
+    case container.accent_color {
+      Some(accent_color) ->
+        case accent_color >= 0 && accent_color <= 0xFFFFFF {
+          True -> []
+          False -> [
+            error(
+              join_path(path, "accent_color"),
+              validation.NumericOutOfRange(
+                min: 0,
+                max: 0xFFFFFF,
+                actual: accent_color,
+                unit: "RGB values",
+              ),
+            ),
+          ]
+        }
+
+      None -> []
+    },
+    container.components
+      |> list.index_map(fn(child, index) {
+        validate_container_child(
+          indexed_path(join_path(path, "components"), index),
+          child,
+          attachment_filenames: attachment_filenames,
+        )
+      })
+      |> list.flatten,
+  ])
 }
 
 fn validate_container_child(

@@ -462,6 +462,10 @@ pub fn execute_payload_validate_v2_component_constraints_test() {
         separator.new()
         |> separator.with_spacing(separator.Large),
       ),
+      component.container(
+        container.new([])
+        |> container.with_accent_color(16_777_216),
+      ),
     ])
     |> execute.with_attachments([
       attachment.new(id: 0, filename: "gallery.png"),
@@ -496,6 +500,15 @@ pub fn execute_payload_validate_v2_component_constraints_test() {
       validation.ValidationError(
         path: "components[2].file.url",
         reason: validation.AttachmentReferenceRequired,
+      ),
+      validation.ValidationError(
+        path: "components[4].accent_color",
+        reason: validation.NumericOutOfRange(
+          min: 0,
+          max: 16_777_215,
+          actual: 16_777_216,
+          unit: "RGB values",
+        ),
       ),
     ])
 }
