@@ -1,6 +1,7 @@
 import gleam/json
 
 import kitazith/component
+import kitazith/component/container
 import kitazith/component/file as component_file
 import kitazith/component/media_gallery
 import kitazith/component/section
@@ -87,4 +88,16 @@ pub fn separator_large_spacing_component_to_json_test() {
     |> json.to_string
 
   assert result == "{\"type\":14,\"spacing\":2}"
+}
+
+pub fn container_component_to_json_test() {
+  let result =
+    test_fixtures.sample_container()
+    |> container.with_id(12)
+    |> component.container
+    |> component.to_json
+    |> json.to_string
+
+  assert result
+    == "{\"type\":17,\"id\":12,\"components\":[{\"type\":10,\"content\":\"# Release\"},{\"type\":9,\"components\":[{\"type\":10,\"content\":\"# Release\"},{\"type\":10,\"content\":\"The build is ready.\"}],\"accessory\":{\"type\":11,\"media\":{\"url\":\"attachment://thumb.png\"}}},{\"type\":12,\"items\":[{\"media\":{\"url\":\"attachment://gallery.png\"},\"description\":\"Gallery preview\"}]},{\"type\":13,\"file\":{\"url\":\"attachment://release-notes.pdf\"}},{\"type\":14,\"divider\":true,\"spacing\":1}],\"accent_color\":5792266}"
 }

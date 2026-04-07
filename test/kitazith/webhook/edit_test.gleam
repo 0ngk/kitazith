@@ -288,6 +288,7 @@ pub fn edit_payload_v2_components_to_json_test() {
       component.media_gallery(test_fixtures.sample_media_gallery()),
       component.file(test_fixtures.sample_file()),
       component.separator(test_fixtures.sample_separator()),
+      component.container(test_fixtures.sample_container()),
     ])
     |> edit.with_attachments([
       attachment.new(id: 0, filename: "thumb.png"),
@@ -298,7 +299,7 @@ pub fn edit_payload_v2_components_to_json_test() {
     |> edit.to_string
 
   assert result
-    == "{\"attachments\":[{\"id\":0,\"filename\":\"thumb.png\"},{\"id\":1,\"filename\":\"gallery.png\"},{\"id\":2,\"filename\":\"release-notes.pdf\"}],\"components\":[{\"type\":10,\"content\":\"# Release\"},{\"type\":9,\"components\":[{\"type\":10,\"content\":\"# Release\"},{\"type\":10,\"content\":\"The build is ready.\"}],\"accessory\":{\"type\":11,\"media\":{\"url\":\"attachment://thumb.png\"}}},{\"type\":12,\"items\":[{\"media\":{\"url\":\"attachment://gallery.png\"},\"description\":\"Gallery preview\"}]},{\"type\":13,\"file\":{\"url\":\"attachment://release-notes.pdf\"}},{\"type\":14,\"divider\":true,\"spacing\":1}],\"flags\":32768}"
+    == "{\"attachments\":[{\"id\":0,\"filename\":\"thumb.png\"},{\"id\":1,\"filename\":\"gallery.png\"},{\"id\":2,\"filename\":\"release-notes.pdf\"}],\"components\":[{\"type\":10,\"content\":\"# Release\"},{\"type\":9,\"components\":[{\"type\":10,\"content\":\"# Release\"},{\"type\":10,\"content\":\"The build is ready.\"}],\"accessory\":{\"type\":11,\"media\":{\"url\":\"attachment://thumb.png\"}}},{\"type\":12,\"items\":[{\"media\":{\"url\":\"attachment://gallery.png\"},\"description\":\"Gallery preview\"}]},{\"type\":13,\"file\":{\"url\":\"attachment://release-notes.pdf\"}},{\"type\":14,\"divider\":true,\"spacing\":1},{\"type\":17,\"components\":[{\"type\":10,\"content\":\"# Release\"},{\"type\":9,\"components\":[{\"type\":10,\"content\":\"# Release\"},{\"type\":10,\"content\":\"The build is ready.\"}],\"accessory\":{\"type\":11,\"media\":{\"url\":\"attachment://thumb.png\"}}},{\"type\":12,\"items\":[{\"media\":{\"url\":\"attachment://gallery.png\"},\"description\":\"Gallery preview\"}]},{\"type\":13,\"file\":{\"url\":\"attachment://release-notes.pdf\"}},{\"type\":14,\"divider\":true,\"spacing\":1}],\"accent_color\":5792266}],\"flags\":32768}"
 }
 
 pub fn edit_payload_validate_v2_components_success_test() {

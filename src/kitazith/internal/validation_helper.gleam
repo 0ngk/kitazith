@@ -8,6 +8,7 @@ import gleam/string
 import kitazith/allowed_mentions
 import kitazith/attachment
 import kitazith/component
+import kitazith/component/container as component_container
 import kitazith/component/file as component_file
 import kitazith/component/media_gallery as component_media_gallery
 import kitazith/component/section as component_section
@@ -443,6 +444,12 @@ fn validate_component(
     component.FileComponent(file) ->
       validate_file(path, file, attachment_filenames: attachment_filenames)
     component.SeparatorComponent(_) -> []
+    component.ContainerComponent(container) ->
+      validate_container(
+        path,
+        container,
+        attachment_filenames: attachment_filenames,
+      )
   }
 }
 
@@ -580,6 +587,48 @@ fn validate_file(
   }
 }
 
+fn validate_container(
+  path: String,
+  container: component_container.Container,
+  attachment_filenames attachment_filenames: Option(List(String)),
+) -> List(validation.ValidationError) {
+  container.components
+  |> list.index_map(fn(child, index) {
+    validate_container_child(
+      indexed_path(join_path(path, "components"), index),
+      child,
+      attachment_filenames: attachment_filenames,
+    )
+  })
+  |> list.flatten
+}
+
+fn validate_container_child(
+  path: String,
+  child: component_container.ContainerChild,
+  attachment_filenames attachment_filenames: Option(List(String)),
+) -> List(validation.ValidationError) {
+  case child {
+    component_container.ContainerTextDisplay(text_display) ->
+      validate_text_display(path, text_display)
+    component_container.ContainerSection(section) ->
+      validate_section(
+        path,
+        section,
+        attachment_filenames: attachment_filenames,
+      )
+    component_container.ContainerMediaGallery(media_gallery) ->
+      validate_media_gallery(
+        path,
+        media_gallery,
+        attachment_filenames: attachment_filenames,
+      )
+    component_container.ContainerFile(file) ->
+      validate_file(path, file, attachment_filenames: attachment_filenames)
+    component_container.ContainerSeparator(_) -> []
+  }
+}
+
 fn validate_attachment_reference(
   path: String,
   url: String,
@@ -636,6 +685,24 @@ fn component_count(component: component.Component) -> Int {
     component.MediaGalleryComponent(_) -> 1
     component.FileComponent(_) -> 1
     component.SeparatorComponent(_) -> 1
+    component.ContainerComponent(container) ->
+      1
+      + {
+        container.components
+        |> list.map(container_child_count)
+        |> list.fold(0, fn(total, count) { total + count })
+      }
+  }
+}
+
+fn container_child_count(child: component_container.ContainerChild) -> Int {
+  case child {
+    component_container.ContainerTextDisplay(_) -> 1
+    component_container.ContainerSection(section) ->
+      1 + list.length(section.components) + 1
+    component_container.ContainerMediaGallery(_) -> 1
+    component_container.ContainerFile(_) -> 1
+    component_container.ContainerSeparator(_) -> 1
   }
 }
 
@@ -675,6 +742,7 @@ fn is_v2_component_type(component_type: Int) -> Bool {
     12 -> True
     13 -> True
     14 -> True
+    17 -> True
     _ -> False
   }
 }
