@@ -8,15 +8,6 @@ import kitazith/component/separator as component_separator
 import kitazith/component/text_display as component_text_display
 import kitazith/internal/json_helper
 
-/// Components allowed inside a container for non-interactive webhook payloads.
-pub type ContainerChild {
-  ContainerTextDisplay(component_text_display.TextDisplay)
-  ContainerSection(component_section.Section)
-  ContainerMediaGallery(component_media_gallery.MediaGallery)
-  ContainerFile(component_file.File)
-  ContainerSeparator(component_separator.Separator)
-}
-
 /// Learn more:
 ///   [Components > Container](https://docs.discord.com/developers/components/reference#container)
 pub type Container {
@@ -27,6 +18,15 @@ pub type Container {
     accent_color: Option(Int),
     spoiler: Option(Bool),
   )
+}
+
+/// Components allowed inside a container for non-interactive webhook payloads.
+pub type ContainerChild {
+  ContainerTextDisplay(component_text_display.TextDisplay)
+  ContainerSection(component_section.Section)
+  ContainerMediaGallery(component_media_gallery.MediaGallery)
+  ContainerFile(component_file.File)
+  ContainerSeparator(component_separator.Separator)
 }
 
 pub fn new(components: List(ContainerChild)) -> Container {
