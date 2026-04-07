@@ -6,6 +6,25 @@ import kitazith/flag
 import kitazith/snowflake.{type Snowflake}
 import kitazith/timestamp
 
+/// A minimal subset of Discord's message object returned by webhook endpoints.
+///
+/// Includes IDs, timestamps, supported flags, and attachment metadata commonly
+/// needed after `execute webhook` or `edit webhook` responses.
+///
+/// Learn more:
+///   [Message Resource - Documentation - Discord > Message Object](https://docs.discord.com/developers/resources/message#message-object)
+pub type WebhookMessage {
+  WebhookMessage(
+    id: Snowflake,
+    channel_id: Snowflake,
+    timestamp: timestamp.Timestamp,
+    edited_timestamp: Option(timestamp.Timestamp),
+    webhook_id: Option(Snowflake),
+    flags: Option(List(flag.MessageFlag)),
+    attachments: List(MessageAttachment),
+  )
+}
+
 /// Attachment metadata returned in Discord message objects.
 ///
 /// Unlike `kitazith/attachment.Attachment`, this models the response attachment
@@ -35,25 +54,6 @@ pub type MessageAttachment {
     /// Base64-encoded bytearray of the voice message
     waveform: Option(String),
     flags: Option(Int),
-  )
-}
-
-/// A minimal subset of Discord's message object returned by webhook endpoints.
-///
-/// Includes IDs, timestamps, supported flags, and attachment metadata commonly
-/// needed after `execute webhook` or `edit webhook` responses.
-///
-/// Learn more:
-///   [Message Resource - Documentation - Discord > Message Object](https://docs.discord.com/developers/resources/message#message-object)
-pub type WebhookMessage {
-  WebhookMessage(
-    id: Snowflake,
-    channel_id: Snowflake,
-    timestamp: timestamp.Timestamp,
-    edited_timestamp: Option(timestamp.Timestamp),
-    webhook_id: Option(Snowflake),
-    flags: Option(List(flag.MessageFlag)),
-    attachments: List(MessageAttachment),
   )
 }
 
