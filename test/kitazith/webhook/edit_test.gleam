@@ -278,3 +278,94 @@ pub fn edit_payload_validate_duplicate_attachment_filename_test() {
       ),
     ])
 }
+
+pub fn edit_payload_v2_components_to_json_test() {
+  let result =
+    edit.new()
+    |> edit.with_components([
+      component.text_display(test_fixtures.sample_text_display()),
+      component.section(test_fixtures.sample_section()),
+      component.media_gallery(test_fixtures.sample_media_gallery()),
+      component.file(test_fixtures.sample_file()),
+    ])
+    |> edit.with_attachments([
+      attachment.new(id: 0, filename: "thumb.png"),
+      attachment.new(id: 1, filename: "gallery.png"),
+      attachment.new(id: 2, filename: "release-notes.pdf"),
+    ])
+    |> edit.with_flags([edit.IsComponentsV2])
+    |> edit.to_string
+
+  assert result
+    == "{\"attachments\":[{\"id\":0,\"filename\":\"thumb.png\"},{\"id\":1,\"filename\":\"gallery.png\"},{\"id\":2,\"filename\":\"release-notes.pdf\"}],\"components\":[{\"type\":10,\"content\":\"# Release\"},{\"type\":9,\"components\":[{\"type\":10,\"content\":\"# Release\"},{\"type\":10,\"content\":\"The build is ready.\"}],\"accessory\":{\"type\":11,\"media\":{\"url\":\"attachment://thumb.png\"}}},{\"type\":12,\"items\":[{\"media\":{\"url\":\"attachment://gallery.png\"},\"description\":\"Gallery preview\"}]},{\"type\":13,\"file\":{\"url\":\"attachment://release-notes.pdf\"}}],\"flags\":32768}"
+}
+
+pub fn edit_payload_validate_v2_components_success_test() {
+  let payload =
+    edit.new()
+    |> edit.with_components([
+      component.section(test_fixtures.sample_section()),
+      component.media_gallery(test_fixtures.sample_media_gallery()),
+      component.file(test_fixtures.sample_file()),
+    ])
+    |> edit.with_attachments([
+      attachment.new(id: 0, filename: "thumb.png"),
+      attachment.new(id: 1, filename: "gallery.png"),
+      attachment.new(id: 2, filename: "release-notes.pdf"),
+    ])
+    |> edit.with_flags([edit.IsComponentsV2])
+
+  assert edit.validate(payload) == Ok(payload)
+}
+
+pub fn edit_payload_validate_v2_components_allow_omitted_flags_test() {
+  let payload =
+    edit.new()
+    |> edit.with_components([
+      component.text_display(test_fixtures.sample_text_display()),
+    ])
+
+  assert edit.validate(payload) == Ok(payload)
+}
+
+pub fn edit_payload_validate_v2_components_require_flag_when_flags_are_set_test() {
+  let result =
+    edit.new()
+    |> edit.with_components([
+      component.text_display(test_fixtures.sample_text_display()),
+    ])
+    |> edit.with_flags([edit.SuppressEmbeds])
+    |> edit.validate
+
+  assert result
+    == Error([
+      validation.ValidationError(
+        path: "flags",
+        reason: validation.RequiresFlag("IsComponentsV2"),
+      ),
+    ])
+}
+
+pub fn edit_payload_validate_v2_components_conflict_test() {
+  let result =
+    edit.new()
+    |> edit.with_content("Hello")
+    |> edit.with_embeds([test_fixtures.sample_embed()])
+    |> edit.with_components([
+      component.text_display(test_fixtures.sample_text_display()),
+    ])
+    |> edit.with_flags([edit.IsComponentsV2])
+    |> edit.validate
+
+  assert result
+    == Error([
+      validation.ValidationError(
+        path: "content",
+        reason: validation.MutuallyExclusiveWith("flags[IsComponentsV2]"),
+      ),
+      validation.ValidationError(
+        path: "embeds",
+        reason: validation.MutuallyExclusiveWith("flags[IsComponentsV2]"),
+      ),
+    ])
+}

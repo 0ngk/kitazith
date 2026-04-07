@@ -27,4 +27,33 @@ pub fn validation_message_test() {
       reason: validation.MutuallyExclusiveWith("thread_name"),
     ))
     == "must not be used together with `thread_name`"
+
+  assert validation.message(validation.ValidationError(
+      path: "components",
+      reason: validation.AggregateComponentLimitExceeded(max: 40, actual: 41),
+    ))
+    == "must contain at most 40 total components"
+
+  assert validation.message(validation.ValidationError(
+      path: "components[0].items",
+      reason: validation.ComponentCountOutOfRange(
+        min: 1,
+        max: 10,
+        actual: 0,
+        item_label: "media gallery items",
+      ),
+    ))
+    == "must contain between 1 and 10 media gallery items"
+
+  assert validation.message(validation.ValidationError(
+      path: "components[0].file.url",
+      reason: validation.AttachmentReferenceRequired,
+    ))
+    == "must use an `attachment://<filename>` reference"
+
+  assert validation.message(validation.ValidationError(
+      path: "flags",
+      reason: validation.RequiresFlag("IsComponentsV2"),
+    ))
+    == "requires the `IsComponentsV2` flag"
 }

@@ -153,6 +153,11 @@ pub fn validate(
     Some(attachments) -> validation_helper.attachment_filenames(attachments)
     None -> []
   }
+  let components_require_v2 = case payload.components {
+    Some(components) -> validation_helper.components_require_v2_flag(components)
+    None -> False
+  }
+  let has_components_v2_flag = has_is_components_v2_flag(payload.flags)
 
   let errors =
     list.flatten([
@@ -207,6 +212,16 @@ pub fn validate(
 
         None -> []
       },
+      case payload.components {
+        Some(components) ->
+          validation_helper.validate_components(
+            "components",
+            components,
+            attachment_filenames: Some(attachment_filenames),
+          )
+
+        None -> []
+      },
       case payload.attachments {
         Some(attachments) ->
           validation_helper.validate_attachments("attachments", attachments)
@@ -216,6 +231,20 @@ pub fn validate(
       case payload.poll {
         Some(poll) -> validation_helper.validate_poll("poll", poll)
         None -> []
+      },
+      case components_require_v2 && !has_components_v2_flag {
+        True -> [
+          validation.ValidationError(
+            path: "flags",
+            reason: validation.RequiresFlag("IsComponentsV2"),
+          ),
+        ]
+
+        False -> []
+      },
+      case has_components_v2_flag {
+        True -> components_v2_conflict_errors(payload)
+        False -> []
       },
     ])
 
@@ -307,4 +336,59 @@ fn validate_query(
 
     _, _ -> []
   }
+}
+
+fn has_is_components_v2_flag(flags: Option(List(ExecutePayloadFlag))) -> Bool {
+  case flags {
+    Some(flags) -> contains_execute_payload_flag(flags, IsComponentsV2)
+    None -> False
+  }
+}
+
+fn contains_execute_payload_flag(
+  flags: List(ExecutePayloadFlag),
+  target: ExecutePayloadFlag,
+) -> Bool {
+  case flags {
+    [] -> False
+    [flag, ..rest] ->
+      flag == target || contains_execute_payload_flag(rest, target)
+  }
+}
+
+fn components_v2_conflict_errors(
+  payload: ExecutePayload,
+) -> List(validation.ValidationError) {
+  list.flatten([
+    case payload.content {
+      Some(_) -> [
+        validation.ValidationError(
+          path: "content",
+          reason: validation.MutuallyExclusiveWith("flags[IsComponentsV2]"),
+        ),
+      ]
+
+      None -> []
+    },
+    case payload.embeds {
+      Some(_) -> [
+        validation.ValidationError(
+          path: "embeds",
+          reason: validation.MutuallyExclusiveWith("flags[IsComponentsV2]"),
+        ),
+      ]
+
+      None -> []
+    },
+    case payload.poll {
+      Some(_) -> [
+        validation.ValidationError(
+          path: "poll",
+          reason: validation.MutuallyExclusiveWith("flags[IsComponentsV2]"),
+        ),
+      ]
+
+      None -> []
+    },
+  ])
 }

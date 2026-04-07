@@ -4,6 +4,11 @@ import gleam/option.{None, Some}
 import kitazith/allowed_mentions
 import kitazith/attachment
 import kitazith/component
+import kitazith/component/file as component_file
+import kitazith/component/media
+import kitazith/component/media_gallery
+import kitazith/component/section
+import kitazith/component/text_display
 import kitazith/embed
 import kitazith/poll
 import kitazith/snowflake
@@ -19,6 +24,35 @@ pub fn sample_attachment() -> attachment.Attachment {
 
 pub fn sample_component() -> component.Component {
   component.raw(json.object([#("type", json.int(1))]))
+}
+
+pub fn sample_text_display() -> text_display.TextDisplay {
+  text_display.new("# Release")
+}
+
+pub fn sample_thumbnail() -> section.Thumbnail {
+  section.new_thumbnail(media.new("attachment://thumb.png"))
+}
+
+pub fn sample_section() -> section.Section {
+  section.new(
+    components: [
+      text_display.new("# Release"),
+      text_display.new("The build is ready."),
+    ],
+    accessory: sample_thumbnail(),
+  )
+}
+
+pub fn sample_media_gallery() -> media_gallery.MediaGallery {
+  media_gallery.new([
+    media_gallery.new_item(media.new("attachment://gallery.png"))
+    |> media_gallery.with_item_description("Gallery preview"),
+  ])
+}
+
+pub fn sample_file() -> component_file.File {
+  component_file.new(media.new("attachment://release-notes.pdf"))
 }
 
 pub fn sample_embed() -> embed.Embed {

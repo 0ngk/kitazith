@@ -1,10 +1,16 @@
 import gleam/json
+import gleam/list
 import gleam/option.{None, Some}
 import gleam/string
 
 import kitazith/allowed_mentions
 import kitazith/attachment
 import kitazith/component
+import kitazith/component/file as component_file
+import kitazith/component/media
+import kitazith/component/media_gallery
+import kitazith/component/section
+import kitazith/component/text_display
 import kitazith/embed
 import kitazith/poll
 import kitazith/snowflake
@@ -341,6 +347,165 @@ pub fn execute_payload_validate_duplicate_attachment_filename_test() {
           filename: "thumb.png",
           indexes: [0, 1],
         ),
+      ),
+    ])
+}
+
+pub fn execute_payload_v2_components_to_json_test() {
+  let result =
+    execute.new()
+    |> execute.with_components([
+      component.text_display(test_fixtures.sample_text_display()),
+      component.section(test_fixtures.sample_section()),
+      component.media_gallery(test_fixtures.sample_media_gallery()),
+      component.file(test_fixtures.sample_file()),
+    ])
+    |> execute.with_attachments([
+      attachment.new(id: 0, filename: "thumb.png"),
+      attachment.new(id: 1, filename: "gallery.png"),
+      attachment.new(id: 2, filename: "release-notes.pdf"),
+    ])
+    |> execute.with_flags([execute.IsComponentsV2])
+    |> execute.to_string
+
+  assert result
+    == "{\"components\":[{\"type\":10,\"content\":\"# Release\"},{\"type\":9,\"components\":[{\"type\":10,\"content\":\"# Release\"},{\"type\":10,\"content\":\"The build is ready.\"}],\"accessory\":{\"type\":11,\"media\":{\"url\":\"attachment://thumb.png\"}}},{\"type\":12,\"items\":[{\"media\":{\"url\":\"attachment://gallery.png\"},\"description\":\"Gallery preview\"}]},{\"type\":13,\"file\":{\"url\":\"attachment://release-notes.pdf\"}}],\"attachments\":[{\"id\":0,\"filename\":\"thumb.png\"},{\"id\":1,\"filename\":\"gallery.png\"},{\"id\":2,\"filename\":\"release-notes.pdf\"}],\"flags\":32768}"
+}
+
+pub fn execute_payload_validate_v2_components_success_test() {
+  let payload =
+    execute.new()
+    |> execute.with_components([
+      component.section(test_fixtures.sample_section()),
+      component.media_gallery(test_fixtures.sample_media_gallery()),
+      component.file(test_fixtures.sample_file()),
+    ])
+    |> execute.with_attachments([
+      attachment.new(id: 0, filename: "thumb.png"),
+      attachment.new(id: 1, filename: "gallery.png"),
+      attachment.new(id: 2, filename: "release-notes.pdf"),
+    ])
+    |> execute.with_flags([execute.IsComponentsV2])
+
+  assert execute.validate(payload) == Ok(payload)
+}
+
+pub fn execute_payload_validate_v2_components_require_flag_test() {
+  let result =
+    execute.new()
+    |> execute.with_components([
+      component.text_display(test_fixtures.sample_text_display()),
+    ])
+    |> execute.validate
+
+  assert result
+    == Error([
+      validation.ValidationError(
+        path: "flags",
+        reason: validation.RequiresFlag("IsComponentsV2"),
+      ),
+    ])
+}
+
+pub fn execute_payload_validate_v2_components_conflict_test() {
+  let result =
+    execute.new()
+    |> execute.with_content("Hello")
+    |> execute.with_embeds([test_fixtures.sample_embed()])
+    |> execute.with_poll(test_fixtures.sample_poll())
+    |> execute.with_components([
+      component.text_display(test_fixtures.sample_text_display()),
+    ])
+    |> execute.with_flags([execute.IsComponentsV2])
+    |> execute.validate
+
+  assert result
+    == Error([
+      validation.ValidationError(
+        path: "content",
+        reason: validation.MutuallyExclusiveWith("flags[IsComponentsV2]"),
+      ),
+      validation.ValidationError(
+        path: "embeds",
+        reason: validation.MutuallyExclusiveWith("flags[IsComponentsV2]"),
+      ),
+      validation.ValidationError(
+        path: "poll",
+        reason: validation.MutuallyExclusiveWith("flags[IsComponentsV2]"),
+      ),
+    ])
+}
+
+pub fn execute_payload_validate_v2_component_constraints_test() {
+  let result =
+    execute.new()
+    |> execute.with_components([
+      component.section(section.new(
+        components: [],
+        accessory: test_fixtures.sample_thumbnail(),
+      )),
+      component.media_gallery(
+        media_gallery.new(list.repeat(
+          media_gallery.new_item(media.new("attachment://gallery.png")),
+          times: 11,
+        )),
+      ),
+      component.file(
+        component_file.new(media.new("https://example.com/file.pdf")),
+      ),
+    ])
+    |> execute.with_attachments([
+      attachment.new(id: 0, filename: "gallery.png"),
+    ])
+    |> execute.with_flags([execute.IsComponentsV2])
+    |> execute.validate
+
+  assert result
+    == Error([
+      validation.ValidationError(
+        path: "components[0].components",
+        reason: validation.ComponentCountOutOfRange(
+          min: 1,
+          max: 3,
+          actual: 0,
+          item_label: "text display components",
+        ),
+      ),
+      validation.ValidationError(
+        path: "components[0].accessory.media.url",
+        reason: validation.MissingAttachmentReference("thumb.png"),
+      ),
+      validation.ValidationError(
+        path: "components[1].items",
+        reason: validation.ComponentCountOutOfRange(
+          min: 1,
+          max: 10,
+          actual: 11,
+          item_label: "media gallery items",
+        ),
+      ),
+      validation.ValidationError(
+        path: "components[2].file.url",
+        reason: validation.AttachmentReferenceRequired,
+      ),
+    ])
+}
+
+pub fn execute_payload_validate_v2_component_total_limit_test() {
+  let result =
+    execute.new()
+    |> execute.with_components(list.repeat(
+      component.text_display(text_display.new("x")),
+      times: 41,
+    ))
+    |> execute.with_flags([execute.IsComponentsV2])
+    |> execute.validate
+
+  assert result
+    == Error([
+      validation.ValidationError(
+        path: "components",
+        reason: validation.AggregateComponentLimitExceeded(max: 40, actual: 41),
       ),
     ])
 }

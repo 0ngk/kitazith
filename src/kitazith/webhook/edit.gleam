@@ -142,6 +142,14 @@ pub fn validate(
     Clear -> Some([])
     Omit -> None
   }
+  let components_require_v2 = case payload.components {
+    Set(components) -> validation_helper.components_require_v2_flag(components)
+    _ -> False
+  }
+  let explicitly_has_components_v2_flag = case payload.flags {
+    Set(flags) -> contains_edit_payload_flag(flags, IsComponentsV2)
+    _ -> False
+  }
 
   let errors =
     list.flatten([
@@ -171,6 +179,16 @@ pub fn validate(
 
         _ -> []
       },
+      case payload.components {
+        Set(components) ->
+          validation_helper.validate_components(
+            "components",
+            components,
+            attachment_filenames: attachment_filenames,
+          )
+
+        _ -> []
+      },
       case payload.allowed_mentions {
         Set(allowed_mentions) ->
           validation_helper.validate_allowed_mentions(
@@ -184,6 +202,24 @@ pub fn validate(
         Set(_) -> []
         Clear -> []
         Omit -> []
+      },
+      case components_require_v2, payload.flags {
+        True, Set(_) ->
+          case explicitly_has_components_v2_flag {
+            True -> []
+            False -> [
+              validation.ValidationError(
+                path: "flags",
+                reason: validation.RequiresFlag("IsComponentsV2"),
+              ),
+            ]
+          }
+
+        _, _ -> []
+      },
+      case explicitly_has_components_v2_flag {
+        True -> components_v2_conflict_errors(payload)
+        False -> []
       },
     ])
 
@@ -274,4 +310,41 @@ fn validate_query(
   // Learn more:
   //   [Webhook Resource - Documentation - Discord > Edit Webhook Message](https://docs.discord.com/developers/resources/webhook#edit-webhook-message)
   []
+}
+
+fn contains_edit_payload_flag(
+  flags: List(EditPayloadFlag),
+  target: EditPayloadFlag,
+) -> Bool {
+  case flags {
+    [] -> False
+    [flag, ..rest] -> flag == target || contains_edit_payload_flag(rest, target)
+  }
+}
+
+fn components_v2_conflict_errors(
+  payload: EditPayload,
+) -> List(validation.ValidationError) {
+  list.flatten([
+    case payload.content {
+      Set(_) -> [
+        validation.ValidationError(
+          path: "content",
+          reason: validation.MutuallyExclusiveWith("flags[IsComponentsV2]"),
+        ),
+      ]
+
+      _ -> []
+    },
+    case payload.embeds {
+      Set(_) -> [
+        validation.ValidationError(
+          path: "embeds",
+          reason: validation.MutuallyExclusiveWith("flags[IsComponentsV2]"),
+        ),
+      ]
+
+      _ -> []
+    },
+  ])
 }
