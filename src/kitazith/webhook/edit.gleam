@@ -9,7 +9,11 @@ import kitazith/component
 import kitazith/embed
 import kitazith/flag
 import kitazith/internal/json_helper
-import kitazith/internal/validation_helper
+import kitazith/internal/validation/allowed_mentions as allowed_mentions_validation
+import kitazith/internal/validation/attachment as attachment_validation
+import kitazith/internal/validation/common as common_validation
+import kitazith/internal/validation/component as component_validation
+import kitazith/internal/validation/embed as embed_validation
 import kitazith/validation
 import kitazith/webhook/edit_query
 
@@ -138,12 +142,13 @@ pub fn validate(
 ) -> Result(EditPayload, List(validation.ValidationError)) {
   let attachment_filenames = case payload.attachments {
     Set(attachments) ->
-      Some(validation_helper.attachment_filenames(attachments))
+      Some(attachment_validation.attachment_filenames(attachments))
     Clear -> Some([])
     Omit -> None
   }
   let components_require_v2 = case payload.components {
-    Set(components) -> validation_helper.components_require_v2_flag(components)
+    Set(components) ->
+      component_validation.components_require_v2_flag(components)
     _ -> False
   }
   let explicitly_has_components_v2_flag = case payload.flags {
@@ -155,7 +160,7 @@ pub fn validate(
     list.flatten([
       case payload.content {
         Set(content) ->
-          validation_helper.validate_string_max_length(
+          common_validation.validate_string_max_length(
             "content",
             content,
             max: 2000,
@@ -165,7 +170,7 @@ pub fn validate(
       },
       case payload.embeds {
         Set(embeds) ->
-          validation_helper.validate_embeds(
+          embed_validation.validate_embeds(
             "embeds",
             embeds,
             attachment_filenames: attachment_filenames,
@@ -175,13 +180,13 @@ pub fn validate(
       },
       case payload.attachments {
         Set(attachments) ->
-          validation_helper.validate_attachments("attachments", attachments)
+          attachment_validation.validate_attachments("attachments", attachments)
 
         _ -> []
       },
       case payload.components {
         Set(components) ->
-          validation_helper.validate_components(
+          component_validation.validate_components(
             "components",
             components,
             attachment_filenames: attachment_filenames,
@@ -191,7 +196,7 @@ pub fn validate(
       },
       case payload.allowed_mentions {
         Set(allowed_mentions) ->
-          validation_helper.validate_allowed_mentions(
+          allowed_mentions_validation.validate_allowed_mentions(
             "allowed_mentions",
             allowed_mentions,
           )
@@ -233,7 +238,7 @@ pub fn validate_with_query(
   payload: EditPayload,
   query: edit_query.EditQuery,
 ) -> Result(EditPayload, List(validation.ValidationError)) {
-  validation_helper.validate_with_query(
+  common_validation.validate_with_query(
     payload,
     query,
     validate,

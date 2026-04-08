@@ -9,7 +9,12 @@ import kitazith/component
 import kitazith/embed
 import kitazith/flag
 import kitazith/internal/json_helper
-import kitazith/internal/validation_helper
+import kitazith/internal/validation/allowed_mentions as allowed_mentions_validation
+import kitazith/internal/validation/attachment as attachment_validation
+import kitazith/internal/validation/common as common_validation
+import kitazith/internal/validation/component as component_validation
+import kitazith/internal/validation/embed as embed_validation
+import kitazith/internal/validation/poll as poll_validation
 import kitazith/poll
 import kitazith/snowflake
 import kitazith/validation
@@ -150,11 +155,12 @@ pub fn validate(
   payload: ExecutePayload,
 ) -> Result(ExecutePayload, List(validation.ValidationError)) {
   let attachment_filenames = case payload.attachments {
-    Some(attachments) -> validation_helper.attachment_filenames(attachments)
+    Some(attachments) -> attachment_validation.attachment_filenames(attachments)
     None -> []
   }
   let components_require_v2 = case payload.components {
-    Some(components) -> validation_helper.components_require_v2_flag(components)
+    Some(components) ->
+      component_validation.components_require_v2_flag(components)
     None -> False
   }
   let has_components_v2_flag = has_is_components_v2_flag(payload.flags)
@@ -163,7 +169,7 @@ pub fn validate(
     list.flatten([
       case payload.content {
         Some(content) ->
-          validation_helper.validate_string_max_length(
+          common_validation.validate_string_max_length(
             "content",
             content,
             max: 2000,
@@ -173,7 +179,7 @@ pub fn validate(
       },
       case payload.username {
         Some(username) ->
-          validation_helper.validate_string_length(
+          common_validation.validate_string_length(
             "username",
             username,
             min: 1,
@@ -184,7 +190,7 @@ pub fn validate(
       },
       case payload.thread_name {
         Some(thread_name) ->
-          validation_helper.validate_string_length(
+          common_validation.validate_string_length(
             "thread_name",
             thread_name,
             min: 1,
@@ -195,7 +201,7 @@ pub fn validate(
       },
       case payload.embeds {
         Some(embeds) ->
-          validation_helper.validate_embeds(
+          embed_validation.validate_embeds(
             "embeds",
             embeds,
             attachment_filenames: Some(attachment_filenames),
@@ -205,7 +211,7 @@ pub fn validate(
       },
       case payload.allowed_mentions {
         Some(allowed_mentions) ->
-          validation_helper.validate_allowed_mentions(
+          allowed_mentions_validation.validate_allowed_mentions(
             "allowed_mentions",
             allowed_mentions,
           )
@@ -214,7 +220,7 @@ pub fn validate(
       },
       case payload.components {
         Some(components) ->
-          validation_helper.validate_components(
+          component_validation.validate_components(
             "components",
             components,
             attachment_filenames: Some(attachment_filenames),
@@ -224,12 +230,12 @@ pub fn validate(
       },
       case payload.attachments {
         Some(attachments) ->
-          validation_helper.validate_attachments("attachments", attachments)
+          attachment_validation.validate_attachments("attachments", attachments)
 
         None -> []
       },
       case payload.poll {
-        Some(poll) -> validation_helper.validate_poll("poll", poll)
+        Some(poll) -> poll_validation.validate_poll("poll", poll)
         None -> []
       },
       case components_require_v2 && !has_components_v2_flag {
@@ -258,7 +264,7 @@ pub fn validate_with_query(
   payload: ExecutePayload,
   query: execute_query.ExecuteQuery,
 ) -> Result(ExecutePayload, List(validation.ValidationError)) {
-  validation_helper.validate_with_query(
+  common_validation.validate_with_query(
     payload,
     query,
     validate,
@@ -340,19 +346,8 @@ fn validate_query(
 
 fn has_is_components_v2_flag(flags: Option(List(ExecutePayloadFlag))) -> Bool {
   case flags {
-    Some(flags) -> contains_execute_payload_flag(flags, IsComponentsV2)
+    Some(flags) -> list.contains(flags, IsComponentsV2)
     None -> False
-  }
-}
-
-fn contains_execute_payload_flag(
-  flags: List(ExecutePayloadFlag),
-  target: ExecutePayloadFlag,
-) -> Bool {
-  case flags {
-    [] -> False
-    [flag, ..rest] ->
-      flag == target || contains_execute_payload_flag(rest, target)
   }
 }
 
