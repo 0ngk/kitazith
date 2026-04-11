@@ -86,7 +86,8 @@ jobs:
 
   publish:
     if: ${{ inputs.run-publish || inputs.run-github-release }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+    environment: release
 
     steps:
       - name: Checkout
@@ -111,7 +112,17 @@ jobs:
         if: ${{ inputs.run-publish }}
         env:
           HEXPM_API_KEY: ${{ secrets.hexpm_api_key }}
-        run: gleam publish --yes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${HEXPM_API_KEY:-}" ]]; then
+            echo "HEXPM_API_KEY secret is not configured." >&2
+            echo "Set the repository secret HEXPM_API_KEY to a valid Hex API key before publishing." >&2
+            exit 1
+          fi
+
+          printf 'I am not using semantic versioning\n' | gleam publish --yes
 
       - name: Create a GitHub release
         if: ${{ inputs.run-github-release }}
