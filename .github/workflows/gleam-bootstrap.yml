@@ -47,7 +47,8 @@ jobs:
         with:
           otp-version: "28"
           gleam-version: "1.15.2"
-          rebar3-version: "3"
+          rebar3-version: "3.27.0"
+          version-type: strict
 
       - name: Validate root and example packages
         if: ${{ inputs.run-validate }}
