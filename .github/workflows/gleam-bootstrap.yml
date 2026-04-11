@@ -1,0 +1,83 @@
+name: Gleam bootstrap
+
+on:
+  workflow_call:
+    inputs:
+      checkout-ref:
+        required: false
+        type: string
+        default: ""
+      run-validate:
+        required: false
+        type: boolean
+        default: false
+      run-tag-version-check:
+        required: false
+        type: boolean
+        default: false
+      run-publish:
+        required: false
+        type: boolean
+        default: false
+      run-github-release:
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      hexpm_api_key:
+        required: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        if: ${{ inputs.checkout-ref == '' }}
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Checkout
+        if: ${{ inputs.checkout-ref != '' }}
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ inputs.checkout-ref }}
+
+      - name: Set up Erlang and Gleam
+        uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93
+        with:
+          otp-version: "28"
+          gleam-version: "1.15.2"
+          rebar3-version: "3"
+
+      - name: Validate root and example packages
+        if: ${{ inputs.run-validate }}
+        run: bash ./scripts/validate_packages.sh
+
+      - name: Validate release tag matches gleam.toml
+        if: ${{ inputs.run-tag-version-check }}
+        shell: bash
+        run: |
+          expected_version="${GITHUB_REF_NAME#v}"
+          package_version="$(sed -nE 's/^version = "([^"]+)"$/\1/p' gleam.toml | head -n 1)"
+
+          if [[ -z "$package_version" ]]; then
+            echo "Failed to read version from gleam.toml" >&2
+            exit 1
+          fi
+
+          if [[ "$package_version" != "$expected_version" ]]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match gleam.toml version ${package_version}" >&2
+            exit 1
+          fi
+
+      - name: Publish package to Hex.pm
+        if: ${{ inputs.run-publish }}
+        env:
+          HEXPM_API_KEY: ${{ secrets.hexpm_api_key }}
+        run: gleam publish --yes
+
+      - name: Create a GitHub release
+        if: ${{ inputs.run-github-release }}
+        uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe
+        with:
+          generate_release_notes: true
