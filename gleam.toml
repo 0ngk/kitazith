@@ -7,7 +7,7 @@ version = "0.1.0"
 description = "A Gleam library for building Discord webhook payloads safely."
 licences = ["MIT"]
 repository = { type = "github", user = "0ngk", repo = "kitazith" }
-# links = [{ title = "Website", href = "" }]
+links = [{ title = "Hex", href = "https://hex.pm/packages/kitazith" }]
 #
 # For a full reference of all the available options, you can have a look at
 # https://gleam.run/writing-gleam/gleam-toml/.
