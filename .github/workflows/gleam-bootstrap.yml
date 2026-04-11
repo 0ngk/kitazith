@@ -28,22 +28,23 @@ on:
         required: false
 
 jobs:
-  run:
+  validate:
+    if: ${{ inputs.run-validate || inputs.run-tag-version-check }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         if: ${{ inputs.checkout-ref == '' }}
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: &actions_checkout actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Checkout
         if: ${{ inputs.checkout-ref != '' }}
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: *actions_checkout
         with:
           ref: ${{ inputs.checkout-ref }}
 
       - name: Set up Erlang and Gleam
-        uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93
+        uses: &setup_beam erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93
         with:
           otp-version: "28"
           gleam-version: "1.15.2"
@@ -70,6 +71,29 @@ jobs:
             echo "Tag ${GITHUB_REF_NAME} does not match gleam.toml version ${package_version}" >&2
             exit 1
           fi
+
+  publish:
+    if: ${{ inputs.run-publish || inputs.run-github-release }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        if: ${{ inputs.checkout-ref == '' }}
+        uses: *actions_checkout
+
+      - name: Checkout
+        if: ${{ inputs.checkout-ref != '' }}
+        uses: *actions_checkout
+        with:
+          ref: ${{ inputs.checkout-ref }}
+
+      - name: Set up Erlang and Gleam
+        uses: *setup_beam
+        with:
+          otp-version: "28"
+          gleam-version: "1.15.2"
+          rebar3-version: "3.27.0"
+          version-type: strict
 
       - name: Publish package to Hex.pm
         if: ${{ inputs.run-publish }}
