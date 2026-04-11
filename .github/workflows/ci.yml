@@ -1,0 +1,15 @@
+name: test
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    uses: ./.github/workflows/gleam-bootstrap.yml
+    with:
+      run-validate: true
