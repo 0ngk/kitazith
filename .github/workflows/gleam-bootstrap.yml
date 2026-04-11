@@ -46,7 +46,7 @@ jobs:
       - name: Set up Erlang and Gleam
         uses: &setup_beam erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93
         with:
-          otp-version: "28"
+          otp-version: "28.4.2"
           gleam-version: "1.15.2"
           rebar3-version: "3.27.0"
           version-type: strict
@@ -74,7 +74,7 @@ jobs:
 
   publish:
     if: ${{ inputs.run-publish || inputs.run-github-release }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout
@@ -90,7 +90,7 @@ jobs:
       - name: Set up Erlang and Gleam
         uses: *setup_beam
         with:
-          otp-version: "28"
+          otp-version: "28.4.2"
           gleam-version: "1.15.2"
           rebar3-version: "3.27.0"
           version-type: strict
