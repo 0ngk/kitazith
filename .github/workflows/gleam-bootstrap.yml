@@ -111,7 +111,7 @@ jobs:
         if: ${{ inputs.run-publish }}
         env:
           HEXPM_API_KEY: ${{ secrets.hexpm_api_key }}
-        run: gleam publish --yes
+        run: printf 'I am not using semantic versioning\n' | gleam publish --yes
 
       - name: Create a GitHub release
         if: ${{ inputs.run-github-release }}
