@@ -7,6 +7,18 @@ on:
         required: false
         type: string
         default: ""
+      otp-version:
+        required: false
+        type: string
+        default: "28.4.2"
+      gleam-version:
+        required: false
+        type: string
+        default: "1.15.2"
+      rebar3-version:
+        required: false
+        type: string
+        default: "3.27.0"
       run-validate:
         required: false
         type: boolean
@@ -46,9 +58,9 @@ jobs:
       - name: Set up Erlang and Gleam
         uses: &setup_beam erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93
         with:
-          otp-version: "28.4.2"
-          gleam-version: "1.15.2"
-          rebar3-version: "3.27.0"
+          otp-version: ${{ inputs.otp-version }}
+          gleam-version: ${{ inputs.gleam-version }}
+          rebar3-version: ${{ inputs.rebar3-version }}
           version-type: strict
 
       - name: Validate root and example packages
@@ -90,9 +102,9 @@ jobs:
       - name: Set up Erlang and Gleam
         uses: *setup_beam
         with:
-          otp-version: "28.4.2"
-          gleam-version: "1.15.2"
-          rebar3-version: "3.27.0"
+          otp-version: ${{ inputs.otp-version }}
+          gleam-version: ${{ inputs.gleam-version }}
+          rebar3-version: ${{ inputs.rebar3-version }}
           version-type: strict
 
       - name: Publish package to Hex.pm
