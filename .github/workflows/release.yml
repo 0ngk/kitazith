@@ -1,0 +1,74 @@
+name: Publish to Hex.pm
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Set up Erlang and Gleam
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "28"
+          gleam-version: "1.15.2"
+          rebar3-version: "3"
+
+      - name: Validate root and example packages
+        run: bash ./scripts/validate_packages.sh
+
+      - name: Validate release tag matches gleam.toml
+        if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+        shell: bash
+        run: |
+          expected_version="${GITHUB_REF_NAME#v}"
+          package_version="$(sed -nE 's/^version = "([^"]+)"$/\1/p' gleam.toml | head -n 1)"
+
+          if [[ -z "$package_version" ]]; then
+            echo "Failed to read version from gleam.toml" >&2
+            exit 1
+          fi
+
+          if [[ "$package_version" != "$expected_version" ]]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match gleam.toml version ${package_version}" >&2
+            exit 1
+          fi
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Set up Erlang and Gleam
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "28"
+          gleam-version: "1.15.2"
+          rebar3-version: "3"
+
+      - name: Publish package to Hex.pm
+        if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+        env:
+          HEXPM_API_KEY: ${{ secrets.HEXPM_API_KEY }}
+        run: gleam publish --yes
+
+      - name: Create a GitHub release
+        if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+        uses: softprops/action-gh-release@v2

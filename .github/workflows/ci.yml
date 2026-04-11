@@ -1,0 +1,26 @@
+name: test
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Erlang and Gleam
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "28"
+          gleam-version: "1.15.2"
+          rebar3-version: "3"
+
+      - name: Validate root and example packages
+        run: bash ./scripts/validate_packages.sh
