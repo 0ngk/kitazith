@@ -1,0 +1,29 @@
+name: Publish to Hex.pm
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    uses: ./.github/workflows/gleam-bootstrap.yml
+    with:
+      checkout-ref: ${{ github.ref }}
+      run-validate: true
+      run-tag-version-check: ${{ github.ref_type == 'tag' && startsWith(github.ref_name, 'v') }}
+
+  publish:
+    needs: verify
+    uses: ./.github/workflows/gleam-bootstrap.yml
+
+    permissions:
+      contents: write
+
+    with:
+      checkout-ref: ${{ github.ref }}
+      run-publish: ${{ github.ref_type == 'tag' && startsWith(github.ref_name, 'v') }}
+      run-github-release: ${{ github.ref_type == 'tag' && startsWith(github.ref_name, 'v') }}
+    secrets:
+      hexpm_api_key: ${{ secrets.HEXPM_API_KEY }}
