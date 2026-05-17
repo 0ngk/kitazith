@@ -48,7 +48,9 @@ pub fn validate_components(
   ])
 }
 
-pub fn components_require_v2_flag(components: List(component.Component)) -> Bool {
+pub fn components_require_v2_flag(
+  components: List(component.Component),
+) -> Bool {
   case components {
     [] -> False
     [component, ..rest] ->

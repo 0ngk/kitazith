@@ -76,7 +76,10 @@ pub fn new() -> ExecutePayload {
   )
 }
 
-pub fn with_content(payload: ExecutePayload, content: String) -> ExecutePayload {
+pub fn with_content(
+  payload: ExecutePayload,
+  content: String,
+) -> ExecutePayload {
   ExecutePayload(..payload, content: Some(content))
 }
 
