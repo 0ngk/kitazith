@@ -21,6 +21,7 @@ pub type ValidationReason {
   AttachmentReferenceMissingFilename
   AttachmentReferenceRequired
   DuplicateAttachmentFilename(filename: String, indexes: List(Int))
+  DuplicateComponentId(id: Int, paths: List(String))
   MutuallyExclusiveWith(other_path: String)
   RequiresFlag(flag_name: String)
 }
@@ -88,6 +89,12 @@ pub fn message(error: ValidationError) -> String {
       <> filename
       <> "` at indexes "
       <> indexes |> list.map(int.to_string) |> string.join(", ")
+
+    DuplicateComponentId(id:, paths:) ->
+      "contains duplicate component id `"
+      <> int.to_string(id)
+      <> "` at paths "
+      <> string.join(paths, ", ")
 
     MutuallyExclusiveWith(other_path) ->
       "must not be used together with `" <> other_path <> "`"

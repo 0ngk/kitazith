@@ -17,6 +17,15 @@ pub fn validation_message_test() {
     == "contains duplicate attachment filename `thumb.png` at indexes 0, 2"
 
   assert validation.message(validation.ValidationError(
+      path: "components",
+      reason: validation.DuplicateComponentId(id: 7, paths: [
+        "components[0].id",
+        "components[1].accessory.id",
+      ]),
+    ))
+    == "contains duplicate component id `7` at paths components[0].id, components[1].accessory.id"
+
+  assert validation.message(validation.ValidationError(
       path: "embeds[0].thumbnail.url",
       reason: validation.AttachmentReferenceMissingFilename,
     ))

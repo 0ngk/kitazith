@@ -8,9 +8,11 @@ import kitazith/component/container as component_container
 import kitazith/component/file as component_file
 import kitazith/component/media_gallery as component_media_gallery
 import kitazith/component/section as component_section
+import kitazith/component/separator as component_separator
 import kitazith/component/text_display as component_text_display
 import kitazith/internal/validation/attachment
 import kitazith/internal/validation/common
+import kitazith/internal/validation/duplicate
 import kitazith/validation
 
 pub fn validate_components(
@@ -36,6 +38,7 @@ pub fn validate_components(
         ),
       ]
     },
+    duplicate_component_id_errors(path, components),
     components
       |> list.index_map(fn(component, index) {
         validate_component(
@@ -55,6 +58,146 @@ pub fn components_require_v2_flag(
     [] -> False
     [component, ..rest] ->
       component_requires_v2_flag(component) || components_require_v2_flag(rest)
+  }
+}
+
+fn duplicate_component_id_errors(
+  path: String,
+  components: List(component.Component),
+) -> List(validation.ValidationError) {
+  components
+  |> list.index_map(fn(component, index) {
+    collect_component_ids(common.indexed_path(path, index), component)
+  })
+  |> list.flatten
+  |> duplicate.find
+  |> list.map(fn(duplicate) {
+    common.error(
+      path,
+      validation.DuplicateComponentId(
+        id: duplicate.value,
+        paths: duplicate.paths,
+      ),
+    )
+  })
+}
+
+fn collect_component_ids(
+  path: String,
+  component: component.Component,
+) -> List(duplicate.Occurrence(Int, String)) {
+  case component {
+    component.Component(_) -> []
+    component.TextDisplayComponent(text_display) ->
+      collect_text_display_ids(path, text_display)
+    component.SectionComponent(section) -> collect_section_ids(path, section)
+    component.MediaGalleryComponent(media_gallery) ->
+      collect_media_gallery_ids(path, media_gallery)
+    component.FileComponent(file) -> collect_file_ids(path, file)
+    component.SeparatorComponent(separator) ->
+      collect_separator_ids(path, separator)
+    component.ContainerComponent(container) ->
+      collect_container_ids(path, container)
+  }
+}
+
+fn collect_text_display_ids(
+  path: String,
+  text_display: component_text_display.TextDisplay,
+) -> List(duplicate.Occurrence(Int, String)) {
+  id_occurrence(text_display.id, common.join_path(path, "id"))
+}
+
+fn collect_section_ids(
+  path: String,
+  section: component_section.Section,
+) -> List(duplicate.Occurrence(Int, String)) {
+  list.flatten([
+    id_occurrence(section.id, common.join_path(path, "id")),
+    section.components
+      |> list.index_map(fn(text_display, index) {
+        collect_text_display_ids(
+          common.indexed_path(common.join_path(path, "components"), index),
+          text_display,
+        )
+      })
+      |> list.flatten,
+    collect_thumbnail_ids(
+      common.join_path(path, "accessory"),
+      section.accessory,
+    ),
+  ])
+}
+
+fn collect_thumbnail_ids(
+  path: String,
+  thumbnail: component_section.Thumbnail,
+) -> List(duplicate.Occurrence(Int, String)) {
+  id_occurrence(thumbnail.id, common.join_path(path, "id"))
+}
+
+fn collect_media_gallery_ids(
+  path: String,
+  media_gallery: component_media_gallery.MediaGallery,
+) -> List(duplicate.Occurrence(Int, String)) {
+  id_occurrence(media_gallery.id, common.join_path(path, "id"))
+}
+
+fn collect_file_ids(
+  path: String,
+  file: component_file.File,
+) -> List(duplicate.Occurrence(Int, String)) {
+  id_occurrence(file.id, common.join_path(path, "id"))
+}
+
+fn collect_separator_ids(
+  path: String,
+  separator: component_separator.Separator,
+) -> List(duplicate.Occurrence(Int, String)) {
+  id_occurrence(separator.id, common.join_path(path, "id"))
+}
+
+fn collect_container_ids(
+  path: String,
+  container: component_container.Container,
+) -> List(duplicate.Occurrence(Int, String)) {
+  list.flatten([
+    id_occurrence(container.id, common.join_path(path, "id")),
+    container.components
+      |> list.index_map(fn(child, index) {
+        collect_container_child_ids(
+          common.indexed_path(common.join_path(path, "components"), index),
+          child,
+        )
+      })
+      |> list.flatten,
+  ])
+}
+
+fn collect_container_child_ids(
+  path: String,
+  child: component_container.ContainerChild,
+) -> List(duplicate.Occurrence(Int, String)) {
+  case child {
+    component_container.ContainerTextDisplay(text_display) ->
+      collect_text_display_ids(path, text_display)
+    component_container.ContainerSection(section) ->
+      collect_section_ids(path, section)
+    component_container.ContainerMediaGallery(media_gallery) ->
+      collect_media_gallery_ids(path, media_gallery)
+    component_container.ContainerFile(file) -> collect_file_ids(path, file)
+    component_container.ContainerSeparator(separator) ->
+      collect_separator_ids(path, separator)
+  }
+}
+
+fn id_occurrence(
+  id: Option(Int),
+  path: String,
+) -> List(duplicate.Occurrence(Int, String)) {
+  case id {
+    Some(id) if id != 0 -> [duplicate.Occurrence(value: id, path: path)]
+    _ -> []
   }
 }
 

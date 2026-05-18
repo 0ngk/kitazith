@@ -4,6 +4,7 @@ import gleam/string
 
 import kitazith/attachment
 import kitazith/internal/validation/common
+import kitazith/internal/validation/duplicate
 import kitazith/validation
 
 pub fn attachment_filenames(
@@ -41,26 +42,31 @@ pub fn validate_attachment_reference(
   url: String,
   attachment_filenames attachment_filenames: Option(List(String)),
 ) -> List(validation.ValidationError) {
-  case attachment_reference_filename(url), attachment_filenames {
-    Some(filename), Some(attachment_filenames) ->
+  case attachment_reference_filename(url) {
+    Some(filename) ->
       case filename == "" {
         True -> [
           common.error(path, validation.AttachmentReferenceMissingFilename),
         ]
 
         False ->
-          case contains_string(in: attachment_filenames, target: filename) {
-            True -> []
-            False -> [
-              common.error(
-                path,
-                validation.MissingAttachmentReference(filename),
-              ),
-            ]
+          case attachment_filenames {
+            Some(attachment_filenames) ->
+              case contains_string(in: attachment_filenames, target: filename) {
+                True -> []
+                False -> [
+                  common.error(
+                    path,
+                    validation.MissingAttachmentReference(filename),
+                  ),
+                ]
+              }
+
+            None -> []
           }
       }
 
-    _, _ -> []
+    None -> []
   }
 }
 
@@ -91,66 +97,17 @@ fn duplicate_attachment_filename_errors(
   attachments: List(attachment.Attachment),
 ) -> List(validation.ValidationError) {
   attachments
-  |> list.index_map(fn(attachment, index) { #(attachment.filename, index) })
-  |> collect_duplicate_attachment_filename_errors(path, seen_filenames: [])
-}
-
-fn collect_duplicate_attachment_filename_errors(
-  indexed_filenames: List(#(String, Int)),
-  path: String,
-  seen_filenames seen_filenames: List(String),
-) -> List(validation.ValidationError) {
-  case indexed_filenames {
-    [] -> []
-    [#(filename, index), ..rest] ->
-      case contains_string(in: seen_filenames, target: filename) {
-        True ->
-          collect_duplicate_attachment_filename_errors(
-            rest,
-            path,
-            seen_filenames: seen_filenames,
-          )
-
-        False -> {
-          let indexes = [
-            index,
-            ..collect_attachment_filename_indexes(rest, filename)
-          ]
-
-          let duplicates = case list.length(indexes) > 1 {
-            True -> [
-              common.error(
-                path,
-                validation.DuplicateAttachmentFilename(filename:, indexes:),
-              ),
-            ]
-
-            False -> []
-          }
-
-          list.append(
-            duplicates,
-            collect_duplicate_attachment_filename_errors(
-              rest,
-              path,
-              seen_filenames: [filename, ..seen_filenames],
-            ),
-          )
-        }
-      }
-  }
-}
-
-fn collect_attachment_filename_indexes(
-  indexed_filenames: List(#(String, Int)),
-  filename: String,
-) -> List(Int) {
-  indexed_filenames
-  |> list.filter_map(fn(indexed_filename) {
-    let #(candidate_filename, candidate_index) = indexed_filename
-    case candidate_filename == filename {
-      True -> Ok(candidate_index)
-      False -> Error(Nil)
-    }
+  |> list.index_map(fn(attachment, index) {
+    duplicate.Occurrence(value: attachment.filename, path: index)
+  })
+  |> duplicate.find
+  |> list.map(fn(duplicate) {
+    common.error(
+      path,
+      validation.DuplicateAttachmentFilename(
+        filename: duplicate.value,
+        indexes: duplicate.paths,
+      ),
+    )
   })
 }
