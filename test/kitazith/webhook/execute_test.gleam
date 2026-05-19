@@ -395,6 +395,97 @@ pub fn execute_payload_validate_v2_components_success_test() {
   assert execute.validate(payload) == Ok(payload)
 }
 
+pub fn execute_payload_validate_duplicate_component_ids_test() {
+  let payload =
+    execute.new()
+    |> execute.with_components([
+      component.text_display(
+        text_display.new("Top")
+        |> text_display.with_id(7),
+      ),
+      component.section(
+        section.new(
+          components: [
+            text_display.new("Nested")
+              |> text_display.with_id(8),
+            text_display.new("Generated")
+              |> text_display.with_id(0),
+          ],
+          accessory: section.new_thumbnail(media.new("attachment://thumb.png"))
+            |> section.with_thumbnail_id(7),
+        )
+        |> section.with_id(0),
+      ),
+      component.container(
+        container.new([
+          container.text_display(
+            text_display.new("Container nested")
+            |> text_display.with_id(8),
+          ),
+          container.separator(
+            separator.new()
+            |> separator.with_id(0),
+          ),
+        ])
+        |> container.with_id(9),
+      ),
+    ])
+    |> execute.with_attachments([
+      attachment.new(id: 0, filename: "thumb.png"),
+    ])
+    |> execute.with_flags([execute.IsComponentsV2])
+
+  assert execute.validate(payload)
+    == Error([
+      validation.ValidationError(
+        path: "components",
+        reason: validation.DuplicateComponentId(id: 7, paths: [
+          "components[0].id",
+          "components[1].accessory.id",
+        ]),
+      ),
+      validation.ValidationError(
+        path: "components",
+        reason: validation.DuplicateComponentId(id: 8, paths: [
+          "components[1].components[0].id",
+          "components[2].components[0].id",
+        ]),
+      ),
+    ])
+}
+
+pub fn execute_payload_validate_unique_component_ids_success_test() {
+  let payload =
+    execute.new()
+    |> execute.with_components([
+      component.text_display(
+        text_display.new("Top")
+        |> text_display.with_id(1),
+      ),
+      component.separator(
+        separator.new()
+        |> separator.with_id(2),
+      ),
+      component.media_gallery(
+        media_gallery.new([
+          media_gallery.new_item(media.new("attachment://gallery.png")),
+        ])
+        |> media_gallery.with_id(3),
+      ),
+      component.file(
+        component_file.new(media.new("attachment://release-notes.pdf"))
+        |> component_file.with_id(4),
+      ),
+    ])
+    |> execute.with_attachments([
+      attachment.new(id: 0, filename: "gallery.png"),
+      attachment.new(id: 1, filename: "release-notes.pdf"),
+    ])
+    |> execute.with_flags([execute.IsComponentsV2])
+
+  assert execute.validate(payload) == Ok(payload)
+}
+
 pub fn execute_payload_validate_v2_components_require_flag_test() {
   let result =
     execute.new()

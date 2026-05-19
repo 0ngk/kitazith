@@ -9,6 +9,11 @@ kitazith is a Gleam library for building Discord incoming webhook payloads safel
 
 Further documentation can be found at <https://hexdocs.pm/kitazith>.
 
+## Disclaimer
+
+kitazith is an unofficial library and is **NOT** endorsed, maintained, or
+guaranteed by Discord.
+
 ## Installation
 
 ```sh
@@ -98,7 +103,8 @@ pub fn build_payload() -> execute.ExecutePayload {
 `kitazith/webhook/execute.validate` and `kitazith/webhook/edit.validate`
 can be used before serialization to catch Discord payload constraint violations
 such as oversized embeds, empty required strings, missing attachment
-references, or duplicate attachment filenames.
+references, duplicate attachment filenames, or duplicate non-zero IDs in typed
+Components V2 payloads.
 
 Each error includes a `reason` for programmatic matching, and
 `kitazith/validation.message` can be used to render a human-readable message.
@@ -129,6 +135,9 @@ When using these typed components:
 - set `execute_query.with_components(True)` or `edit_query.with_components(True)`
 - include the `execute.IsComponentsV2` or `edit.IsComponentsV2` flag
 - do not send `content`, `embeds`, or `poll` in the same payload
+- keep explicit component `id` values unique across the whole component tree;
+  `id = 0` is treated as empty/generated and is ignored by duplicate ID
+  validation
 
 ```gleam
 import gleam/http
@@ -188,7 +197,8 @@ pub fn build_request() {
 ```
 
 `component.raw` remains available as an escape hatch for unsupported or
-application-owned webhook component payloads.
+application-owned webhook component payloads. Raw component payloads are not
+scanned for duplicate component IDs or interactive `custom_id` values.
 
 ## Using Attachments Within Embeds
 

@@ -6,6 +6,8 @@ import gleam/string
 import kitazith/allowed_mentions
 import kitazith/attachment
 import kitazith/component
+import kitazith/component/container
+import kitazith/component/text_display
 import kitazith/embed
 import kitazith/snowflake
 import kitazith/test_fixtures
@@ -221,6 +223,24 @@ pub fn edit_payload_validate_attachment_reference_after_clear_test() {
     ])
 }
 
+pub fn edit_payload_validate_attachment_reference_missing_filename_test() {
+  let result =
+    edit.new()
+    |> edit.with_embeds([
+      embed.new()
+      |> embed.with_thumbnail(embed.EmbedThumbnail(url: "attachment://")),
+    ])
+    |> edit.validate
+
+  assert result
+    == Error([
+      validation.ValidationError(
+        path: "embeds[0].thumbnail.url",
+        reason: validation.AttachmentReferenceMissingFilename,
+      ),
+    ])
+}
+
 pub fn edit_payload_validate_embed_and_mentions_constraints_test() {
   let result =
     edit.new()
@@ -318,6 +338,38 @@ pub fn edit_payload_validate_v2_components_success_test() {
     |> edit.with_flags([edit.IsComponentsV2])
 
   assert edit.validate(payload) == Ok(payload)
+}
+
+pub fn edit_payload_validate_duplicate_component_ids_test() {
+  let result =
+    edit.new()
+    |> edit.with_components([
+      component.text_display(
+        text_display.new("Top")
+        |> text_display.with_id(42),
+      ),
+      component.container(
+        container.new([
+          container.text_display(
+            text_display.new("Nested")
+            |> text_display.with_id(42),
+          ),
+        ]),
+      ),
+    ])
+    |> edit.with_flags([edit.IsComponentsV2])
+    |> edit.validate
+
+  assert result
+    == Error([
+      validation.ValidationError(
+        path: "components",
+        reason: validation.DuplicateComponentId(id: 42, paths: [
+          "components[0].id",
+          "components[1].components[0].id",
+        ]),
+      ),
+    ])
 }
 
 pub fn edit_payload_validate_v2_components_allow_omitted_flags_test() {

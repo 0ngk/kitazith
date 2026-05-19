@@ -205,7 +205,9 @@ fn optional_author_name_length(value: Option(embed.EmbedAuthor)) -> Int {
   }
 }
 
-fn optional_field_character_count(value: Option(List(embed.EmbedField))) -> Int {
+fn optional_field_character_count(
+  value: Option(List(embed.EmbedField)),
+) -> Int {
   case value {
     Some(fields) ->
       fields
