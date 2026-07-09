@@ -34,7 +34,7 @@
           pkgs.findutils
           pkgs.git
           pkgs.gleam
-          pkgs.erlang
+          pkgs.beamPackages.erlang
           pkgs.rebar3
           pkgs.nodejs_22
         ];
@@ -51,7 +51,7 @@
           pkgs.git
 
           pkgs.gleam
-          pkgs.erlang
+          pkgs.beamPackages.erlang
           pkgs.rebar3
 
           pkgs.nodejs_22
